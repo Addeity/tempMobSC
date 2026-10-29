@@ -1,0 +1,121 @@
+/* The ring's own controls: the Rings / Spiral switch, the hover label, the
+   cursor, and the footer with its counter and motion control. */
+
+/* ------------------------------------------------- layout switch */
+.switch {
+  position: fixed; z-index: 45; top: 29px; left: 50%; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px;
+  border-radius: var(--r-pill); border: 1px solid var(--glass-b);
+  background: var(--glass);
+}
+/* GSAP owns the switch's opacity during the entrance; CSS takes it back after */
+html.is-settled .switch { transition: opacity var(--t-2) var(--e-out); }
+body.is-flow-open .switch, body.is-route-open .switch,
+body.is-ring-done .switch, body.is-past-ring .switch { opacity: 0; pointer-events: none; visibility: hidden; }
+html.is-settled .switch { transition: opacity var(--t-2) var(--e-out), visibility var(--t-2); }
+.switch__pill {
+  position: absolute; top: 4px; bottom: 4px; left: 0;
+  border-radius: var(--r-pill); background: var(--ink);
+}
+.switch__btn {
+  position: relative; z-index: 1; border: 0; background: none; cursor: pointer;
+  padding: 7px 17px; border-radius: var(--r-pill);
+  font-family: inherit; font-size: 13.5px; font-weight: 500; color: var(--ink-2);
+  transition: color var(--t-2) var(--e-out);
+}
+.switch__btn:hover { color: var(--ink); }
+.switch__btn.is-active { color: var(--ground); }
+
+/* -------------------------------------------------------- the label */
+.label { position: fixed; z-index: 50; left: 0; top: 0; pointer-events: none; }
+.label__pill {
+  position: absolute; left: 0; top: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 15px; width: max-content;
+  border-radius: var(--r-pill); border: 1px solid var(--glass-b);
+  background: var(--glass);
+  color: var(--ink); font-size: 13.5px;
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--t-2) var(--e-out), visibility var(--t-2);
+}
+.label__pill.is-visible { opacity: 1; visibility: visible; }
+.label__pill--main { transform: translateY(-50%) translate(22px, 2px); }
+.label__pill--cue  { transform: translateY(-50%) translate(22px, 48px); color: var(--ink-2); }
+.label__title { font-family: var(--serif); font-size: 16px; }
+.label__cat { color: var(--ink-3); font-size: 12.5px; }
+.label__arrow { width: 12px; height: 12px; }
+
+/* ------------------------------------------------------------ cursor */
+/* a dot that inverts what it is over and opens into a ring over a card */
+.cursor {
+  position: fixed; z-index: 80; left: 0; top: 0;
+  width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%;
+  pointer-events: none; mix-blend-mode: difference;
+  opacity: 0; transition: opacity var(--t-2) var(--e-out);
+}
+.cursor::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: #fff; border: 1px solid #fff;
+  transform: scale(.3);
+  transition: transform var(--t-2) var(--e-out), background-color var(--t-2) var(--e-out);
+}
+.cursor.is-on { opacity: 1; }
+.cursor.is-hovering::before { transform: scale(1); background: transparent; }
+body.is-flow-open .cursor, body.is-route-open .cursor, body.is-past-ring .cursor { opacity: 0; }
+@media (hover: none) { .cursor { display: none; } }
+@media (prefers-reduced-motion: reduce) { .cursor { display: none; } }
+
+/* ------------------------------------------------------------- foot */
+.foot {
+  position: fixed; inset: auto 0 0 0; z-index: 40;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; padding: 18px var(--margin);
+  font-size: 12.5px; color: var(--ink-3);
+}
+.foot__item { display: flex; align-items: center; gap: 18px; }
+.foot__mid { position: absolute; left: 50%; transform: translateX(-50%); }
+.foot__sel { color: var(--ink); font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; margin-right: 6px; }
+.foot__link { padding: 6px 2px; color: var(--ink-3); text-decoration: none; transition: color var(--t-2) var(--e-out); }
+.foot__link:hover { color: var(--ink); }
+
+/* WCAG 2.2.2: the ring and its screens move for longer than five seconds,
+   so there is a control that stops them */
+.foot__pause {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 2px; border: 0; background: none; cursor: pointer;
+  font: inherit; color: var(--ink-3); border-radius: 6px;
+  transition: color var(--t-2) var(--e-out);
+}
+.foot__pause:hover { color: var(--ink); }
+.foot__pause-i { position: relative; width: 9px; height: 10px; }
+.foot__pause-i::before, .foot__pause-i::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 3px; border-radius: 1px; background: currentColor;
+}
+.foot__pause-i::before { left: 0; }
+.foot__pause-i::after { right: 0; }
+.foot__pause[aria-pressed="true"] .foot__pause-i::before {
+  width: 0; height: 0; border-radius: 0; background: none;
+  border-style: solid; border-width: 5px 0 5px 9px; border-color: transparent transparent transparent currentColor;
+}
+.foot__pause[aria-pressed="true"] .foot__pause-i::after { display: none; }
+
+/* over the not-found notice the nav comes forward, so the way out is in reach */
+body.is-route-open .nav { z-index: 58; }
+/* the ring's own bar (its counter and its pause) belongs to the ring: it
+   leaves as the ring opens, since the tour has its own count and its own
+   pause, and the page ends in the footer band, which carries the rest */
+html.is-settled .foot { transition: opacity var(--t-2) var(--e-out), visibility var(--t-2); }
+body.is-route-open .foot, body.is-ring-done .foot, body.is-past-ring .foot { opacity: 0; visibility: hidden; }
+body.is-route-open .label, body.is-past-ring .label, body.is-ring-done .label { display: none; }
+
+@media (max-width: 1180px) { .switch { top: 82px; } }
+@media (max-width: 900px) {
+  .switch { top: 76px; }
+  .label { display: none; }
+  .foot__mid { display: none; }
+}
+@media (max-width: 640px) {
+  .switch { top: 70px; }
+  .foot { padding-top: 14px; padding-bottom: 14px; justify-content: flex-end; }
+  .foot__line:first-child { display: none; }
+}

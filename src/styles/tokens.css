@@ -1,0 +1,161 @@
+/* ==========================================================================
+   Tokens
+   --------------------------------------------------------------------------
+   COLOUR, read off the product rather than invented. Dominant pixels sampled
+   from the recording:
+     light surface  #f8f8f8   ink #202020     primary  #1850e0   chart #7898f0
+     signal         #e89000   dark #080808    dark primary #5098f8
+
+   The page comes in the product's two themes. Dark (the default where the
+   system says nothing): the ground is #080808 pulled a few degrees toward
+   the product's own blue, so the recordings read as lit glass. Light: below.
+   html[data-theme] is set before the first paint (index.html) from the
+   visitor's choice, or their system's.
+
+     ground    #05070c   ink on it            = 18.5:1
+     cobalt    #1850e0   white on it          =  6.4:1  (fills, primary action)
+     cobalt-on #5098f8   on the ground        =  6.9:1  (links, focus, labels)
+     amber     #e89000   on the player panel  =  7.8:1  (the playhead, nothing else)
+     ink-2     .70 alpha on the ground        =  9.1:1
+     ink-3     .52 alpha on the ground        =  5.3:1
+   ========================================================================== */
+
+/* Fallbacks shaped like the real faces, so text set in them takes the same
+   room as the web font and the swap when it arrives moves nothing (on a slow
+   connection the headline sits in the fallback for seconds, and a line
+   breaking differently is a visible jump). Measured in the browser against
+   the self-hosted files. Newsreader changes shape with size (its optical
+   sizes), so it has two: set at 22 to 34px it runs 93% of Georgia's width,
+   and at headline sizes (40 to 66px) about 96.5%. Plex Sans runs 2.38%
+   wider than Arial. */
+@font-face {
+  font-family: "Newsreader Fallback"; src: local("Georgia");
+  size-adjust: 93%; ascent-override: 72.37%; descent-override: 26.4%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Newsreader Display Fallback"; src: local("Georgia");
+  size-adjust: 96.5%; ascent-override: 72.37%; descent-override: 26.4%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Plex Sans Fallback"; src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 102.38%; ascent-override: 100.6%; descent-override: 27.35%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Plex Mono Fallback"; src: local("Courier New"), local("Courier");
+  size-adjust: 99.98%; ascent-override: 103.02%; descent-override: 28%; line-gap-override: 0%;
+}
+
+:root {
+  color-scheme: dark;
+
+  --ground:    #05070c;
+  --ground-rgb: 5 7 12;   /* for gradients that fade the ground to nothing */
+  --ground-2:  #090c14;
+  --surface:   #0d111b;
+  --surface-2: #131826;
+  --surface-3: #1a2031;
+
+  --ink:       #f4f5f7;
+  --ink-2:     rgba(244,245,247,.70);
+  --ink-3:     rgba(244,245,247,.52);
+  --ink-4:     rgba(244,245,247,.28);   /* disabled and rules only */
+  --line:      rgba(226,232,245,.08);
+  --line-2:    rgba(226,232,245,.14);
+  --line-3:    rgba(226,232,245,.24);
+  /* the faint fill a quiet control takes, and takes more of on hover */
+  --wash:      rgba(255,255,255,.03);
+  --wash-2:    rgba(255,255,255,.07);
+
+  --cobalt:    #1850e0;
+  --cobalt-hi: #2a62f0;
+  --cobalt-on: #5098f8;
+  --amber:     #e89000;
+  --danger:    #ff9b91;
+
+  /* chrome over the moving scene: dark enough to read without a blur */
+  --glass:     rgba(9,12,20,.72);
+  --glass-b:   rgba(226,232,245,.12);
+
+  /* the finish: a dark sheet is lit faintly from above, a sheen down its
+     face and a highlight along its top edge (styles/pages.css) */
+  --sheen:     linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,0) 46%);
+  --edge:      inset 0 1px 0 rgba(255,255,255,.055);
+  /* what a raised sheet casts */
+  --lift:      0 30px 70px -40px rgba(0,0,0,.9);
+  /* the one sheet set in the other theme's colours (the plan most people pick) */
+  --contra:    #f8f8f8;
+  --contra-ink: #14161b;
+  --contra-ink-2: #2b2f37;
+  --contra-ink-3: #5a5f69;
+
+  --r-pill:    999px;
+  --r-card:    22px;
+  --r-screen:  14px;
+  --margin:    clamp(16px, 3vw, 40px);
+
+  /* Motion: four durations, two curves and two springs, and nothing else
+     (src/lib/motion.ts holds the same for scripts). What follows a finger
+     or the scroll has no duration: it goes where it is put.
+       --t-1  120ms  a press, a hover, a small state
+       --t-2  240ms  a state change, a fade, anything leaving
+       --t-3  420ms  a panel: a sheet's contents, a list item, a pill sliding
+       --t-4  700ms  a move: a heading or a picture arriving, a sheet, a screen growing */
+  --t-1: 120ms;
+  --t-2: 240ms;
+  --t-3: 420ms;
+  --t-4: 700ms;
+  --e-out: cubic-bezier(.16,1,.3,1);   /* arriving and settling: fast out, a long settle */
+  --e-in:  cubic-bezier(.32,0,.67,0);  /* leaving: a short accelerate */
+  /* a sheet or a card moving into place: critically damped, at rest without a bounce */
+  --spring: linear(0, .064, .198, .348, .487, .607, .704, .781, .839, .883, .916, .94, .958, .97, .979, .986, .99, .994, .996, .998, .999, .999, 1);
+  /* something pressed or switched: over by 2% and back */
+  --spring-soft: linear(0, .033, .113, .219, .336, .452, .561, .659, .743, .814, .871, .916, .95, .975, .993, 1.005, 1.012, 1.016, 1.017, 1.017, 1.015, 1.013, 1.011, 1.009, 1.006, 1.004, 1.003, 1.001, 1);
+
+  --serif: "Newsreader", "Newsreader Fallback", Georgia, serif;
+  --serif-display: "Newsreader", "Newsreader Display Fallback", Georgia, serif;   /* the headlines */
+  --font:  "IBM Plex Sans", "Plex Sans Fallback", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:  "IBM Plex Mono", "Plex Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ==========================================================================
+   Light: the product's own light screens become the page. Paper a few
+   degrees toward the product's blue, ink nearly black; the accent darkens
+   so links and labels on paper keep AA (cobalt-on #1546c4 on the ground is
+   6.6:1, ink-3 is 5.0:1). The footer band stays black in both: it is the
+   end of the page, and its liquid metal is dark by nature.
+   ========================================================================== */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --ground:    #f2f3f6;
+  --ground-rgb: 242 243 246;
+  --ground-2:  #eaecf1;
+  --surface:   #ffffff;
+  --surface-2: #f6f7f9;
+  --surface-3: #eceef3;
+
+  --ink:       #0b0f17;
+  --ink-2:     rgba(11,15,23,.74);
+  --ink-3:     rgba(11,15,23,.6);
+  --ink-4:     rgba(11,15,23,.3);
+  --line:      rgba(11,15,23,.08);
+  --line-2:    rgba(11,15,23,.13);
+  --line-3:    rgba(11,15,23,.22);
+  --wash:      rgba(11,15,23,.03);
+  --wash-2:    rgba(11,15,23,.065);
+
+  --cobalt-on: #1546c4;
+  --amber:     #8a4b00;   /* the playhead on paper: 5.4:1 on the player's ground */
+  --danger:    #b42318;
+
+  --glass:     rgba(255,255,255,.78);
+  --glass-b:   rgba(11,15,23,.1);
+
+  --sheen:     linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,0) 46%);
+  --edge:      inset 0 1px 0 rgba(255,255,255,.9);
+  --lift:      0 1px 2px rgba(11,15,23,.05), 0 30px 60px -36px rgba(11,15,23,.32);
+  --contra:    #0d111b;
+  --contra-ink: #f4f5f7;
+  --contra-ink-2: rgba(244,245,247,.78);
+  --contra-ink-3: rgba(244,245,247,.62);
+}

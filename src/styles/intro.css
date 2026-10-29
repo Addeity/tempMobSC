@@ -1,0 +1,88 @@
+/* The intro: the ring's stretch of the page. It is six and a half screens
+   tall (five and a half of scrolling before the tour has risen over it) and
+   its frame is pinned while they scroll past, so the scroll turns
+   the ring (src/scene/stage.ts) from a start to an end: the headline at the
+   top, two lines on the way, and a rail at the side that fills from Start to
+   End. src/app.ts writes the progress, 0 to 1, as --p; everything here reads
+   it, so nothing in the frame is moved by a script. Over the last stretch
+   the tour's sheet rises over it (styles/tour.css). */
+.intro { position: relative; z-index: 2; height: 650vh; pointer-events: none; }
+.intro__pin { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.intro :is(a, button) { pointer-events: auto; }
+
+/* Two lines on the way down, each on its own pool of the ground. Each line
+   of them rises into view from behind its own lower edge as the scroll
+   reaches it, and later leaves up through its upper one, a line at a time:
+   crisp the whole way, never half faded over the moving cards. The lines
+   are cut as laid out (src/ui/lines.ts), each in a box that clips it; the
+   scroll writes each one's place, and the pool's strength (--pool), straight
+   onto it (src/ui/introScroll.ts). Here they rest below their edges. */
+.intro__say {
+  position: absolute; left: var(--margin); bottom: clamp(66px, 9vh, 100px);
+  width: min(560px, calc(100vw - 2 * var(--margin))); margin: 0;
+  opacity: 0;
+}
+.intro__say.is-split { opacity: 1; }
+.intro__say::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  inset: -200px -200px -110px calc(-1 * var(--margin) - 40px);
+  background: radial-gradient(closest-side at 40% 54%, rgb(var(--ground-rgb) / .9), rgb(var(--ground-rgb) / .8) 45%, rgb(var(--ground-rgb) / .5) 72%, rgb(var(--ground-rgb) / 0));
+  opacity: var(--pool, 0);
+}
+.intro__say-t {
+  margin: 0; font-family: var(--serif-display); font-weight: 400; font-size: clamp(28px, 3vw, 44px);
+  line-height: 1.06; letter-spacing: -.022em; text-wrap: balance;
+}
+.intro__say-k {
+  display: flex; align-items: center; gap: 12px; margin: 0 0 16px;
+  font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--cobalt-on);
+}
+.intro__say-k::before { content: ""; flex: none; width: 26px; height: 1px; background: currentColor; opacity: .7; }
+.intro__say :is(.intro__say-k, .ln) { transform: translateY(120%); }
+/* the kicker is its own clip; the lines sit in theirs, a little taller than the line so no descender is cut */
+.intro__say-k { clip-path: inset(0 -40px 120% -40px); }
+.intro__say .ln-mask { padding: .06em 0 .12em; margin: -.06em 0 -.12em; }
+
+/* the start and the end, and where the scroll is between them */
+.rail {
+  position: absolute; right: var(--margin); top: 50%; transform: translateY(-50%);
+  display: grid; justify-items: center; gap: 12px;
+  font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-2);
+}
+/* a card can turn right behind the labels: each sits on a chip of the ground, so it reads over any screen */
+.rail__k { padding: 3px 5px 3px 7px; border-radius: 6px; background: rgb(var(--ground-rgb) / .82); }
+.rail__bar { position: relative; width: 2px; height: min(32vh, 260px); border-radius: 2px; background: var(--line-2); overflow: hidden; }
+.rail__fill { position: absolute; inset: 0; border-radius: inherit; background: var(--cobalt-on); transform-origin: 50% 0; transform: scaleY(0); }
+
+/* a nudge to scroll, gone with the first of it; it runs twice and rests (under five seconds, WCAG 2.2.2) */
+.intro__cue {
+  position: absolute; right: var(--margin); bottom: clamp(70px, 10vh, 104px); margin: 0;
+  display: grid; justify-items: center; gap: 10px; width: 2px; overflow: visible;
+  font-family: var(--mono); font-size: 10.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3);
+  writing-mode: vertical-rl;
+}
+.intro__cue-line { width: 1px; height: 36px; background: linear-gradient(var(--ink-2), rgb(var(--ground-rgb) / 0)); transform-origin: 50% 0; animation: cue 2.2s var(--e-out) 1.8s 2 both; }
+@keyframes cue {
+  0% { transform: scaleY(0); opacity: 1; }
+  60% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: .35; }
+}
+
+@media (max-width: 640px) {
+  .intro__say { bottom: 58px; }
+  .intro__say-t { font-size: clamp(25px, 7.4vw, 32px); }
+  .rail { right: 10px; gap: 10px; font-size: 11px; letter-spacing: .12em; }
+  .rail__bar { height: 22vh; }
+  .intro__cue { display: none; }
+}
+
+/* with reduced motion nothing slides: each line shows and goes with the scroll as a fade (written as its opacity) */
+@media (prefers-reduced-motion: reduce) {
+  .intro__say :is(.intro__say-k, .ln) { transform: none; clip-path: none; }
+}
+
+/* without the ring (no scripts, or no WebGL) there is nothing to scroll
+   through: the intro is the headline, and the page carries on under it */
+:is(html:not(.js), html.no-webgl) .intro { height: auto; pointer-events: auto; }
+:is(html:not(.js), html.no-webgl) .intro__pin { position: relative; height: auto; overflow: visible; }
+:is(html:not(.js), html.no-webgl) :is(.intro__say, .rail, .intro__cue) { display: none; }

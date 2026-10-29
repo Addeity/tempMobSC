@@ -1,0 +1,120 @@
+/* The legal page: a page of its own, laid over the site with its own scroll
+   (build/panels.ts, src/ui/router.ts). A bar stays at the top with the way
+   back and a tab for each document; the overview lists the five as cards,
+   and each document is set as a reading page, with the next one at its end.
+   Which view shows is set by data-doc on <html> (the rules for that are
+   written into the page beside the markup). */
+.doc { background: var(--ground); z-index: 60; }
+html[data-route="legal"] .doc { visibility: visible; opacity: 1; content-visibility: visible; }
+/* over the legal page the bars of the site are out of sight, not just covered */
+body.is-doc-open :is(.nav, .foot, .switch, .label, .cursor) { visibility: hidden; }
+html[data-route="legal"] :is(.nav, .foot, .switch) { visibility: hidden; }
+
+.doc__wrap {
+  display: flex; flex-direction: column; min-height: 100%;
+  max-width: 1120px; margin: 0 auto; padding: 0 var(--margin) 36px;
+}
+
+/* ------------------------------------------------------------ the bar */
+.doc__bar {
+  position: sticky; top: 0; z-index: 2;
+  display: flex; align-items: center; gap: 16px;
+  padding: 18px 0 22px;
+  background: linear-gradient(to bottom, var(--ground) 72%, rgb(var(--ground-rgb) / 0));
+}
+.doc__back {
+  display: inline-flex; align-items: center; gap: 9px; flex: none;
+  height: 42px; padding: 0 18px 0 13px; border-radius: var(--r-pill);
+  border: 1px solid var(--line-2); background: var(--wash); box-shadow: var(--edge);
+  color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none;
+  transition: border-color var(--t-2) var(--e-out), background-color var(--t-2) var(--e-out), transform var(--t-1) var(--e-out);
+}
+.doc__back:hover { border-color: var(--line-3); background: var(--wash-2); }
+.doc__back:active { transform: scale(.97); }
+.doc__back-i { width: 15px; height: 15px; rotate: 225deg; transition: translate var(--t-2) var(--e-out); }
+.doc__back:hover .doc__back-i { translate: -2px 0; }
+.doc__tabs {
+  display: flex; gap: 2px; margin-left: auto; padding: 4px; min-width: 0;
+  border: 1px solid var(--line-2); border-radius: var(--r-pill); background: var(--surface);
+  overflow-x: auto; scrollbar-width: none;
+}
+.doc__tabs::-webkit-scrollbar { display: none; }
+.doc__tab {
+  flex: none; padding: 8px 15px; border-radius: var(--r-pill);
+  color: var(--ink-2); font-size: 13.5px; font-weight: 500; text-decoration: none; white-space: nowrap;
+  transition: color var(--t-2) var(--e-out), background-color var(--t-2) var(--e-out);
+}
+.doc__tab:hover { color: var(--ink); }
+
+/* ----------------------------------------------------------- the head */
+.doc__head { max-width: 780px; padding: clamp(40px, 8vw, 104px) 0 clamp(28px, 4vw, 52px); }
+.doc__kicker { justify-content: flex-start; gap: 12px; margin-bottom: 22px; }
+.doc__kicker::after { display: none; }
+.doc__kicker a { color: inherit; text-decoration: none; }
+.doc__kicker a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.doc__kicker span { color: var(--ink-4); }
+.doc__h {
+  margin: 0; font-family: var(--serif-display); font-weight: 400;
+  font-size: clamp(42px, 6.6vw, 92px); line-height: .98; letter-spacing: -.032em; text-wrap: balance;
+}
+.doc__h:focus { outline: none; }
+.doc__lede { margin: 22px 0 0; max-width: 58ch; color: var(--ink-2); font-size: clamp(16px, 1.4vw, 18px); line-height: 1.6; }
+.doc__updated {
+  margin: 22px 0 0; font-family: var(--mono); font-size: 11.5px; font-weight: 500;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+}
+
+/* ------------------------------------------------------- the overview */
+.doc__cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.doc__cards li:first-child { grid-column: 1 / -1; }
+.doc__card {
+  position: relative; display: grid; grid-template-columns: 1fr auto; align-content: start; gap: 10px 16px;
+  height: 100%; padding: clamp(22px, 2.6vw, 32px);
+  border: 1px solid var(--line-2); border-radius: var(--r-card);
+  background: var(--sheen), var(--surface); box-shadow: var(--edge);
+  color: var(--ink); text-decoration: none;
+  transition: border-color var(--t-2) var(--e-out), transform var(--t-2) var(--e-out);
+}
+.doc__card:hover { border-color: var(--cobalt-on); }
+.doc__card:active { transform: scale(.985); }
+.doc__n { font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; color: var(--cobalt-on); }
+.doc__go { grid-row: 1; grid-column: 2; width: 20px; height: 20px; color: var(--ink-3); transition: color var(--t-2) var(--e-out), translate var(--t-2) var(--e-out); }
+.doc__card:hover .doc__go { color: var(--cobalt-on); translate: 2px -2px; }
+.doc__t { grid-column: 1 / -1; font-family: var(--serif); font-size: clamp(26px, 2.6vw, 34px); line-height: 1.1; letter-spacing: -.015em; }
+.doc__d { grid-column: 1 / -1; max-width: 62ch; color: var(--ink-2); font-size: 14.5px; line-height: 1.55; }
+
+/* ------------------------------------------------------- a document */
+.doc__prose { max-width: 66ch; }
+.doc__prose p { margin: 0 0 1.15em; color: var(--ink-2); font-size: 17px; line-height: 1.72; }
+.doc__prose p:first-child { color: var(--ink); font-size: clamp(18px, 1.6vw, 20px); line-height: 1.6; }
+.doc__pager { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: clamp(48px, 7vw, 88px); }
+.doc__page {
+  display: grid; gap: 4px; padding: 20px 24px;
+  border: 1px solid var(--line-2); border-radius: var(--r-card); background: var(--surface);
+  color: var(--ink); text-decoration: none;
+  transition: border-color var(--t-2) var(--e-out), transform var(--t-1) var(--e-out);
+}
+.doc__page:hover { border-color: var(--line-3); }
+.doc__page:active { transform: scale(.985); }
+.doc__page--next { grid-column: 2; text-align: right; }
+.doc__page-k { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.doc__page-t { font-family: var(--serif); font-size: 23px; letter-spacing: -.01em; }
+
+.doc__foot {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px;
+  margin-top: auto; padding-top: 72px; color: var(--ink-3); font-size: 13px;
+}
+.doc__foot a { color: var(--ink-2); text-underline-offset: 3px; }
+
+@media (max-width: 767px) {
+  .doc__bar { flex-wrap: wrap; gap: 12px; padding: 14px 0 18px; }
+  .doc__tabs { order: 2; flex-basis: 100%; margin-left: 0; }
+  .doc__cards { grid-template-columns: minmax(0, 1fr); }
+  .doc__prose p { font-size: 16px; }
+  .doc__pager { grid-template-columns: minmax(0, 1fr); }
+  .doc__page--next { grid-column: auto; text-align: left; }
+}
+
+@media print {
+  .doc__bar, .doc__pager { display: none !important; }
+}

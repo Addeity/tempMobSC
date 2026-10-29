@@ -1,0 +1,36 @@
+# OwnAI
+
+> A private AI workroom for your company: documents, assistant, projects, time and clients, on hardware you control.
+
+The workroom that stays inside your network. Every workflow below is a short film recorded in the product itself, with its steps written out on its own page.
+
+## Pages
+
+- [Home](https://ownai.example/): A private AI workroom for your company: documents, assistant, projects, time and clients, on hardware you control.
+- [How it stays private](https://ownai.example/platform/): OwnAI runs on a server you control, with a local model or one you choose. What runs where, the controls your security team will ask about, and how it compares.
+- [Pricing](https://ownai.example/pricing/): Every OwnAI plan is the same product on your own server, priced per company rather than per question or per seat.
+- [About](https://ownai.example/company/): Who makes OwnAI, and how we work: priced per company, honest about fit, never in your data path.
+- [Contact](https://ownai.example/contact/): Book a demo on your own documents, in your own workroom, with citations you can open. We reply within one working day.
+- [Privacy and legal](https://ownai.example/legal/): What this website collects and what it does not, its terms of use and its imprint.
+- [Privacy](https://ownai.example/legal/privacy/): This website is run by [registered company name], [address] ("we").
+- [Cookies](https://ownai.example/legal/cookies/): This site sets no cookies.
+- [Terms of use](https://ownai.example/legal/terms/): The films and copy on this site show OwnAI as it works today; features, plans and prices can change.
+- [Accessibility](https://ownai.example/legal/accessibility/): This site is built to be used with a keyboard, a screen reader, zoom and reduced motion.
+- [Imprint](https://ownai.example/legal/imprint/): [Registered company name], [legal form]
+
+## Workflows
+
+- [Your day on one page](https://ownai.example/workflows/dashboard/): Open the workroom and the day is already laid out: what you are carrying, the timer, your week in hours, the projects in progress and what the company has posted.
+- [Ask your own documents](https://ownai.example/workflows/assistant/): A question box over the company’s documents. Beside it, each answer shows the passages it came from, any memory it applied and what the turn cost.
+- [Start a project the way it will run](https://ownai.example/workflows/newproject/): Name it, give it a key and a lead, then choose how it will be run. The method sets the stages, the meetings and who answers for each.
+- [Tick off the stages](https://ownai.example/workflows/stages/): A project carries its method’s meetings, stages and roles. Tick a stage when it is done and the next one starts.
+- [Review the design in place](https://ownai.example/workflows/design/): A Figma file linked to the project opens inside it, full screen if you like, so the review sits next to the tickets it belongs to.
+- [Every view of the same tickets](https://ownai.example/workflows/views/): List, calendar, timeline, mind map, sprints, team, workload, throughput and activity are all worked out from the project’s tickets. Change a ticket and every view follows.
+- [A client report from the record](https://ownai.example/workflows/report/): The report for the client is assembled from the project’s own record. Read it, then save it into the project’s documents to edit and send.
+- [Time, leave and clients](https://ownai.example/workflows/time/): Your hours from the running timer, the team’s by project and by day, leave booked against each person’s year, and clients with their invoices and expenses, in the same room as the work.
+- [The floor, live](https://ownai.example/workflows/floor/): An isometric workroom of the company. Below it: who is carrying what, what the assistant is doing, and the jobs the machine room ran today.
+- [Who can see what](https://ownai.example/workflows/people/): People, roles and subscriptions in one place. A grid shows what each role may open, and every change lands in the security log.
+- [Measured against thresholds](https://ownai.example/workflows/analytics/): Use across the instance: answers, tokens, response time and budget stops, each measured against the threshold a build has to meet.
+- [Progress, measured on purpose](https://ownai.example/workflows/progress/): Your own work over 90 days: tickets finished and filed, hours logged, billable share and who you worked alongside, against the window before and the team median.
+
+Contact: hello@ownai.example

@@ -1,0 +1,64 @@
+/* The one statement the top of the page makes. It sits under the ring's
+   lower edge in the intro's pinned frame, and leaves as the scroll starts
+   turning the ring: each part rises out through the top of its own box, the
+   kicker first and the buttons last, so the copy is crisp until it is gone
+   and never a grey ghost over the moving cards. The scroll writes each
+   part's place and clip straight onto it (src/ui/introScroll.ts); with
+   reduced motion it writes a fade (--fade) instead. A card under the pointer
+   dims the whole, so it never fights one. */
+@property --dim { syntax: "<number>"; inherits: false; initial-value: 1; }
+.hero {
+  position: absolute; z-index: 1;
+  left: var(--margin); bottom: clamp(66px, 9vh, 100px);
+  width: min(600px, calc(100vw - 2 * var(--margin)));
+  pointer-events: none;
+  opacity: calc(var(--dim) * var(--fade, 1));
+  transition: --dim var(--t-3) var(--e-out);
+}
+:is(html:not(.js), html.no-webgl) .hero > * { transform: none; clip-path: none; }
+.hero__cta { pointer-events: auto; }
+/* past the first stretch the buttons are out of reach, as they are out of sight */
+body.is-ring-done .hero__cta, body.is-past-ring .hero__cta { visibility: hidden; }
+/* the copy sits on a pool of the ground's own colour, so a light screen
+   passing behind the headline never cuts through it; the pool fades with
+   the copy (it is part of the hero) */
+.hero::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  inset: -220px -200px -110px calc(-1 * var(--margin) - 40px);
+  background: radial-gradient(closest-side at 40% 54%, rgb(var(--ground-rgb) / .88), rgb(var(--ground-rgb) / .8) 45%, rgb(var(--ground-rgb) / .5) 72%, rgb(var(--ground-rgb) / 0));
+  opacity: var(--pool, 1);
+}
+:is(html:not(.js), html.no-webgl) .hero::before { display: none; }
+/* a short rule leads the kicker in, as a section mark does in print */
+.hero__kicker {
+  display: flex; align-items: center; gap: 12px;
+  margin: 0 0 18px; font-family: var(--mono); font-size: 11.5px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--cobalt-on);
+}
+.hero__kicker::before { content: ""; flex: none; width: 26px; height: 1px; background: currentColor; opacity: .7; }
+/* the small line nearest the cards gets a halo of the ground under it: a light screen can pass right behind it */
+.hero__kicker { text-shadow: 0 0 6px rgb(var(--ground-rgb) / .95), 0 0 14px rgb(var(--ground-rgb) / .9), 0 0 28px rgb(var(--ground-rgb) / .7); }
+.hero__h {
+  margin: 0; font-family: var(--serif-display); font-weight: 400;
+  font-size: clamp(36px, 4.1vw, 64px); line-height: 1; letter-spacing: -.024em;
+  font-optical-sizing: auto; text-wrap: balance;
+}
+.hero__p { margin: 16px 0 0; max-width: 42ch; color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+/* who runs it, in one quiet line under the buttons (only once there are real names) */
+.hero__proof { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin: 22px 0 0; pointer-events: auto; }
+.hero__proof-k { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.hero__proof-n { font-family: var(--serif); font-size: 16px; color: var(--ink-2); }
+
+body.is-hovering .hero { --dim: .14; }
+
+@media (max-width: 640px) {
+  .hero { bottom: 58px; }
+  .hero__h { font-size: clamp(31px, 9vw, 40px); }
+  .hero__p { font-size: 14.5px; margin-top: 14px; }
+  .hero__cta { margin-top: 20px; }
+}
+@media (max-width: 359px) {
+  .hero__cta .btn--ghost { display: none; }
+}
+@media (max-width: 640px) { .hero__proof { display: none; } }

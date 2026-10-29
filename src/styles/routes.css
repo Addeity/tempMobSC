@@ -1,0 +1,318 @@
+/* The sections: the page after the tour, one after another on the ground,
+   each with its own address (src/ui/router.ts). Opaque, and above the ring's
+   stage, which is out of sight by then. Each section's top padding clears
+   the nav, so landing on one puts its heading just under it. */
+.sec { position: relative; z-index: 3; background: var(--ground); }
+/* a section well off the screen is not laid out or painted until it comes
+   near: the page is long, and laying all of it out held the first paint of
+   a phone back by half a second. It keeps the size it last had (auto), and
+   until it has had one, about a screen and a half */
+html.js .sec { content-visibility: auto; contain-intrinsic-size: auto 1400px; }
+.sec + .sec, .tour + .sec { border-top: 1px solid var(--line); }
+/* Sections as sheets: each one slides up over the one before, which steps
+   back under it (a little smaller, a little further, dimmer) as it leaves
+   the top of the screen, read off its own passage, so it reverses with the
+   scroll; the tour steps back the same way under the first, as the ring
+   did under the tour. Each shrinks toward its own lower edge, the part
+   still in sight, so a tall one recedes as a short one does. It dims under
+   a veil of the ground laid over it, not by fading whole: the same look,
+   but a fading section must be drawn apart and then blended, every frame,
+   and what has gone past reads as faint text where it rests. Transform and
+   opacity only. Contact is not one: the footer is uncovered from under it. */
+@supports (animation-timeline: view()) {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .sec { border-radius: 28px 28px 0 0; box-shadow: 0 -26px 60px -34px rgba(0,0,0,.75); }
+    :root[data-theme="light"] .sec { box-shadow: 0 -22px 50px -34px rgba(11,15,23,.3); }
+    :is(html.js .tour, .sec:not(#contact)) {
+      view-timeline: --sheet block;
+      transform-origin: 50% 100%;
+      animation: step-back linear both;
+      animation-timeline: --sheet;
+      animation-range: exit 0% exit 100%;
+    }
+    :is(html.js .tour, .sec:not(#contact))::after {
+      content: ""; position: absolute; inset: 0; z-index: 50; pointer-events: none;
+      border-radius: inherit; background: var(--ground); opacity: 0;
+      animation: step-dim linear both;
+      animation-timeline: --sheet;
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+@keyframes step-back { to { transform: translateY(40vh) scale(.94); } }
+@keyframes step-dim { to { opacity: .65; } }
+.sec__inner {
+  max-width: 1240px; margin: 0 auto;
+  padding: clamp(96px, 11vw, 150px) var(--margin) clamp(64px, 8vw, 110px);
+}
+
+/* The one thing still laid over the page: the not-found notice. A closed
+   one is not laid out at all; where the browser can, its contents stay laid
+   out until its fade has finished. */
+.route {
+  position: fixed; inset: 0; z-index: 55;
+  background: rgb(var(--ground-rgb) / .96);
+  overflow-y: auto; overscroll-behavior: contain;
+  visibility: hidden; opacity: 0; content-visibility: hidden;
+  transition: opacity var(--t-3) var(--e-out), visibility var(--t-3);
+}
+@supports (transition-behavior: allow-discrete) {
+  .route { transition: opacity var(--t-3) var(--e-out), visibility var(--t-3), content-visibility var(--t-3) allow-discrete; }
+}
+/* opening, it is there at once (only the fade takes time), so a link to one of its sections can scroll straight to it */
+.route.is-open { visibility: visible; opacity: 1; content-visibility: visible; transition: opacity var(--t-3) var(--e-out); }
+/* while Lenis eases the page (src/ui/scroll.ts) it sets the scroll itself: an
+   embedded frame must not swallow the wheel half-way through a glide */
+html.lenis-smooth iframe { pointer-events: none; }
+.route__inner {
+  max-width: 1240px; margin: 0 auto;
+  padding: clamp(96px, 11vw, 150px) var(--margin) clamp(72px, 9vw, 120px);
+}
+
+.route__head { max-width: 800px; margin: 0 auto clamp(38px, 5vw, 64px); text-align: center; }
+.route__kicker {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  margin: 0 0 20px; font-family: var(--mono); font-size: 11.5px; font-weight: 500;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--cobalt-on);
+}
+/* centred, the kicker is held between two short rules */
+.route__kicker::before, .route__kicker::after { content: ""; flex: none; width: 22px; height: 1px; background: currentColor; opacity: .55; }
+.route__h {
+  margin: 0 0 18px; font-family: var(--serif-display); font-weight: 400;
+  font-size: clamp(34px, 5vw, 66px); line-height: 1.02; letter-spacing: -.022em; text-wrap: balance;
+}
+.route__lede { margin: 0 auto; max-width: 60ch; color: var(--ink-2); font-size: clamp(15px, 1.3vw, 17px); }
+.route__sub {
+  margin: clamp(56px, 7vw, 88px) 0 clamp(20px, 2.4vw, 30px);
+  font-family: var(--serif); font-weight: 400; font-size: clamp(26px, 2.9vw, 38px); line-height: 1.12; letter-spacing: -.018em;
+}
+.route__fine { margin: 26px 0 0; text-align: center; color: var(--ink-3); font-size: 13px; }
+
+/* the last thing on every page before the footer: a lit room of its own,
+   cobalt rising from the top edge with a bright seam along it */
+.route__cta {
+  position: relative; overflow: hidden;
+  margin-top: clamp(64px, 8vw, 104px); padding: clamp(40px, 6vw, 76px) clamp(22px, 4vw, 52px);
+  border: 1px solid rgba(80,152,248,.24); border-radius: calc(var(--r-card) + 6px);
+  background:
+    radial-gradient(70% 100% at 50% 0%, rgba(24,80,224,.28), rgba(24,80,224,0) 72%),
+    var(--sheen), var(--surface);
+  box-shadow: var(--edge), 0 60px 120px -70px rgba(24,80,224,.6);
+  text-align: center;
+}
+.route__cta::before {
+  content: ""; position: absolute; top: 0; left: 50%; width: min(560px, 72%); height: 1px; transform: translateX(-50%);
+  background: linear-gradient(90deg, rgba(120,170,255,0), rgba(140,185,255,.95), rgba(120,170,255,0));
+}
+.route__cta-h { margin: 0 0 14px; font-family: var(--serif-display); font-weight: 400; font-size: clamp(30px, 3.6vw, 48px); line-height: 1.06; letter-spacing: -.022em; text-wrap: balance; }
+.route__cta-p { margin: 0 auto 28px; max-width: 52ch; color: var(--ink-2); }
+.route__btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.route__head .route__btns { margin-top: 28px; }
+
+/* Hidden until the scroll brings them in (src/ui/router.ts), then brought
+   in by .is-in, each after a short delay (--d) so a row comes in order, 40ms
+   apart and no more than six steps deep. Three kinds, by what arrives:
+     .rv          words and cards: they rise a little as they appear
+     .rv--lines   headings: each line rises from behind its own edge (the
+                  lines are cut just before they come into view, src/ui/lines.ts)
+     .rv--clip    a diagram, a sheet of figures, a form: it comes up from a
+                  little below and a little smaller, as a sheet set down
+   Moving `translate`, not `transform`, so a card's own hover and press still
+   apply. An address landed on directly shows at once, so its headline is
+   never waiting on a script; .is-shown is shown as it is. */
+html.js:not([data-route]) .rv:not(.is-shown, .rv--lines) { opacity: 0; }
+.rv.is-in:not(.rv--lines) { animation: rise var(--t-3) var(--e-out) var(--d, 0s) both; }
+@keyframes rise {
+  from { opacity: 0; translate: 0 12px; }
+  to { opacity: 1; translate: none; }
+}
+/* a heading waits, unseen, for its lines; then each waits under its edge */
+html.js:not([data-route]) .rv--lines:not(.is-shown, .is-cut) { opacity: 0; }
+html.js:not([data-route]) .rv--lines:not(.is-shown, .is-in) .ln { translate: 0 110%; }
+.rv--lines.is-in .ln { animation: line-up var(--t-4) var(--e-out) calc(var(--d, 0s) + (var(--line, 1) - 1) * 70ms) both; }
+@keyframes line-up { from { translate: 0 110%; } to { translate: none; } }
+/* the clip a little taller than the line, so no descender is cut */
+.rv--lines .ln-mask { padding-bottom: .1em; margin-bottom: -.1em; }
+/* (moved and faded only, so it runs on the compositor: an animated clip-path
+   was repainted every frame of the 700ms, and several at once held a phone's
+   scroll up) */
+.rv--clip.is-in { animation: lift var(--t-4) var(--e-out) var(--d, 0s) both; }
+@keyframes lift {
+  from { opacity: 0; scale: .965; translate: 0 22px; }
+  to { opacity: 1; scale: 1; translate: none; }
+}
+/* with reduced motion nothing rises or opens: whatever arrives fades in, briefly */
+@media (prefers-reduced-motion: reduce) {
+  html.js:not([data-route]) .rv:not(.is-shown) { opacity: 0; }
+  .rv.is-in, .rv--lines.is-in, .rv--clip.is-in { animation: fade var(--t-2) linear var(--d, 0s) both; }
+}
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ------------------------------------------------------ pricing: plans */
+.billing {
+  display: inline-flex; gap: 4px; margin-top: 26px; padding: 4px;
+  border: 1px solid var(--glass-b); border-radius: var(--r-pill); background: var(--surface);
+}
+.billing button {
+  border: 0; background: none; cursor: pointer; padding: 8px 16px;
+  border-radius: var(--r-pill); font-family: inherit; font-size: 13.5px; font-weight: 500; color: var(--ink-2);
+  transition: color var(--t-2) var(--e-out), background-color var(--t-2) var(--e-out);
+}
+.billing button:hover { color: var(--ink); }
+.billing button.is-on { background: var(--ink); color: var(--ground); }
+.billing__save { color: var(--cobalt-on); font-size: 12px; margin-left: 6px; }
+.billing button.is-on .billing__save { color: var(--cobalt); }
+
+.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.plan {
+  position: relative; display: flex; flex-direction: column;
+  padding: 26px 24px 24px;
+  border-radius: var(--r-card); border: 1px solid var(--line-2);
+  background: var(--surface); color: var(--ink);
+  transition: border-color var(--t-2) var(--e-out);
+}
+.plan:not(.plan--featured):hover { border-color: var(--line-3); }
+/* the one sheet in the other theme's colours: the plan most people pick,
+   light on the dark page (the colour the product's own pages are) and dark
+   on the light one */
+.plan--featured {
+  background: var(--contra); color: var(--contra-ink); border-color: transparent;
+  box-shadow: var(--lift), 0 40px 110px -48px rgba(24,80,224,.75);
+}
+.plan--featured ::selection { background: rgba(24,80,224,.22); color: var(--contra-ink); }
+.plan__badge {
+  position: absolute; top: 18px; right: 18px; padding: 4px 10px; border-radius: var(--r-pill);
+  background: var(--cobalt); color: #fff; font-size: 11px; font-weight: 500; letter-spacing: .02em;
+}
+.plan__name { margin: 0 0 6px; font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -.01em; }
+.plan__for { margin: 0 0 22px; font-size: 13.5px; line-height: 1.5; color: var(--ink-3); min-height: 3em; }
+.plan--featured .plan__for { color: var(--contra-ink-3); }
+.plan__price { display: flex; align-items: baseline; gap: 6px; margin: 0 0 4px; }
+.plan__amt { font-size: 38px; font-weight: 500; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.plan__per { font-size: 13px; color: var(--ink-3); }
+.plan__note { margin: 0 0 20px; font-size: 12px; color: var(--ink-3); }
+.plan--featured .plan__per, .plan--featured .plan__note { color: var(--contra-ink-3); }
+.plan__cta { align-self: flex-start; margin-bottom: 22px; }
+.plan__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; font-size: 13.5px; color: var(--ink-2); }
+.plan--featured .plan__list { color: var(--contra-ink-2); }
+.plan__list li { position: relative; padding-left: 18px; line-height: 1.45; }
+.plan__list li::before { content: ""; position: absolute; left: 0; top: .5em; width: 6px; height: 6px; border-radius: 50%; background: var(--cobalt-on); }
+.plan--featured .plan__list li::before { background: var(--cobalt); }
+.plan__list li.muted { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-4); }
+.plan__list li.muted::before { background: var(--ink-4); }
+
+/* the pill inside a sheet: quiet on the dark plans, cobalt on the light one */
+.btn--ink { background: var(--surface-3); color: var(--ink); border-color: var(--line-2); }
+.btn--ink:hover { background: color-mix(in srgb, var(--surface-3), var(--ink) 7%); border-color: var(--line-3); }
+.plan--featured .btn--ink { background: var(--cobalt); color: #fff; border-color: transparent; }
+.plan--featured .btn--ink:hover { background: var(--cobalt-hi); }
+
+/* --------------------------------------------------- pricing: the table */
+.sheet { padding: 8px; border-radius: var(--r-card); background: var(--surface); color: var(--ink); border: 1px solid var(--line-2); }
+/* positioned, so the words read to screen readers inside its cells (.sr, absolutely placed) are clipped with the rest of the table */
+.sheet__scroll { position: relative; overflow-x: auto; }
+.ctable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ctable th, .ctable td { padding: 13px 16px; text-align: left; }
+.ctable thead th {
+  font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-3); border-bottom: 1px solid var(--line-2);
+}
+.ctable tbody tr + tr th, .ctable tbody tr + tr td { border-top: 1px solid var(--line); }
+.ctable tbody th { font-weight: 500; color: var(--ink); }
+.ctable tbody td { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* included is a drawn tick on a tinted disc, the same mark as the security
+   checklist; not included is a short rule. Each cell says which in words
+   for a screen reader, which a glyph left to the font never did. */
+.ctable td.yes::before, .ctable td.no::before { content: ""; display: inline-block; vertical-align: middle; }
+.ctable td.yes::before {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(80,152,248,.14) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%235098f8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8.4l2.6 2.6L12 5.4'/%3E%3C/svg%3E") center / 13px no-repeat;
+}
+.ctable td.no::before { width: 12px; height: 1.5px; margin-left: 5px; border-radius: 1px; background: var(--ink-4); }
+/* the plan most people pick, picked out down its column too */
+.ctable--plans :is(th, td):nth-child(3) { background: rgba(24,80,224,.07); }
+.ctable--plans thead th:nth-child(3) { color: var(--cobalt-on); }
+
+/* --------------------------------------------------- pricing: questions */
+/* the wash grows from the edge the pointer came in by and leaves by the
+   edge it went out through (src/ui/faq.ts writes the origin) */
+.qa { display: grid; gap: 10px; }
+.qa__i { position: relative; isolation: isolate; overflow: hidden; border-radius: var(--r-card); border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); }
+.qa__wash {
+  position: absolute; inset: 0; z-index: -1; background: var(--cobalt);
+  transform: scaleY(0); transform-origin: 50% 50%; pointer-events: none;
+  transition: transform var(--t-2) var(--e-out);
+}
+.qa__i[data-hot] .qa__wash, .qa__i:has(.qa__q:focus-visible) .qa__wash { transform: scaleY(1); }
+.qa__q {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 20px 24px; cursor: pointer; list-style: none;
+  font-size: 16px; line-height: 1.5; font-weight: 500; color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--t-2) var(--e-out);
+}
+.qa__q:focus-visible { outline: none; }
+.qa__q::-webkit-details-marker { display: none; }
+.qa__i[data-hot] .qa__q, .qa__q:focus-visible { color: #fff; }
+.qa__x { position: relative; width: 15px; height: 15px; flex: none; color: var(--ink-3); transition: rotate var(--t-2) var(--e-out), color var(--t-2) var(--e-out); }
+.qa__x::before, .qa__x::after { content: ""; position: absolute; left: 50%; top: 50%; background: currentColor; transform: translate(-50%, -50%); }
+.qa__x::before { width: 15px; height: 1.5px; }
+.qa__x::after  { width: 1.5px; height: 15px; }
+.qa__i[open] .qa__x { rotate: 45deg; }
+.qa__i[data-hot] .qa__x, .qa__i:has(.qa__q:focus-visible) .qa__x { color: rgba(255,255,255,.86); }
+.qa__b { overflow: hidden; }
+.qa__b p { margin: 0; padding: 0 24px 22px; color: var(--ink-2); font-size: 14.5px; max-width: 74ch; transition: color var(--t-2) var(--e-out); }
+.qa__i[data-hot] .qa__b p, .qa__i:has(.qa__q:focus-visible) .qa__b p { color: rgba(255,255,255,.86); }
+
+/* -------------------------------------------------------- contact form */
+.contact__grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 16px; align-items: start; }
+.form { display: grid; gap: 18px; padding: clamp(22px, 2.6vw, 34px); }
+.form__row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.field { display: grid; gap: 7px; align-content: start; }
+.field label { font-size: 12.5px; font-weight: 500; letter-spacing: .02em; color: var(--ink-2); }
+.field input, .field select, .field textarea {
+  width: 100%; padding: 12px 14px; border-radius: 12px;
+  border: 1px solid var(--line-2); background: var(--ground-2); color: var(--ink);
+  font-family: inherit; font-size: 15px; line-height: 1.4;
+  transition: border-color var(--t-2) var(--e-out), box-shadow var(--t-2) var(--e-out);
+}
+.field input::placeholder, .field textarea::placeholder { color: var(--ink-3); }
+.field select option { background: var(--surface); color: var(--ink); }
+.field textarea { resize: vertical; min-height: 96px; }
+.field input:hover, .field select:hover, .field textarea:hover { border-color: var(--line-3); }
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible {
+  outline: none; border-color: var(--cobalt-on); box-shadow: 0 0 0 3px rgba(80,152,248,.22);
+}
+.field input[aria-invalid="true"], .field select[aria-invalid="true"] { border-color: var(--danger); }
+.field__err { font-size: 12.5px; color: var(--danger); min-height: 1em; }
+.form__msg { margin: 0; font-size: 14px; color: var(--cobalt-on); min-height: 1.2em; }
+.form__fine { margin: 0; font-size: 12.5px; color: var(--ink-3); }
+.form__fine a { color: var(--ink-2); text-underline-offset: 3px; }
+.form__fine a:hover { color: var(--ink); }
+
+.info { display: grid; gap: 12px; }
+.info__c { display: flex; gap: 14px; padding: 18px 20px; border: 1px solid var(--line-2); border-radius: var(--r-card); background: var(--surface); }
+.info__i { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; background: var(--surface-3); color: var(--cobalt-on); }
+.info__i svg { width: 18px; height: 18px; }
+.info__k { margin: 0 0 3px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.info__v { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.info__v a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-3); text-underline-offset: 3px; }
+.info__v a:hover { text-decoration-color: var(--cobalt-on); }
+
+@media (max-width: 900px) {
+  .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .contact__grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  /* on a phone the tables scroll sideways rather than squeeze: the first
+     column stays put, values never break, and the right edge fades to say
+     there is more */
+  .ctable { min-width: 540px; }
+  .ctable td { white-space: nowrap; }
+  .ctable :is(th[scope="row"], thead th:first-child) { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+  .ctable :is(th, td):last-child { padding-right: 36px; }
+  .sheet__scroll { mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); }
+  .plans { grid-template-columns: minmax(0, 1fr); }
+  .form__row { grid-template-columns: minmax(0, 1fr); }
+  .route__inner, .sec__inner { padding-top: 104px; }
+}

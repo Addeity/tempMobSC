@@ -1,0 +1,194 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+/* One page, scrolled as a document: the ring, the tour and the sections are
+   all the same scroll (src/ui/scroll.ts reads it once a frame). A film or
+   the not-found notice over it holds it still; the scrollbar's gutter is
+   kept meanwhile, so nothing under it shifts sideways. */
+html { scrollbar-gutter: stable; overscroll-behavior-y: none; }
+html.is-locked { overflow: hidden; }
+/* Lenis eases the scroll itself, so the browser's own smoothing stays out of its way */
+html.lenis.lenis-smooth { scroll-behavior: auto !important; }
+html.lenis.lenis-stopped { overflow: hidden; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible { outline: 2px solid var(--cobalt-on); outline-offset: 3px; }
+
+/* the first thing a keyboard reaches: straight to the workflows as a list */
+.skip {
+  position: fixed; z-index: 90; left: var(--margin); top: 12px;
+  padding: 10px 16px; border-radius: var(--r-pill);
+  background: var(--ink); color: var(--ground); font-size: 14px; font-weight: 500; text-decoration: none;
+  transform: translateY(-160%);
+}
+.skip:focus-visible { transform: none; }
+
+/* a prerendered address paints its own state before any script runs:
+   /pricing/ is scrolled to its section by the page's last inline script,
+   /workflows/<key>/ has its film open, poster and all, and an unknown
+   address its notice (scripts adopt what is already on screen rather than
+   animating it in again) */
+html[data-flow] .flow { visibility: visible; pointer-events: auto; content-visibility: visible; }
+html[data-route="missing"] .route--missing { visibility: visible; opacity: 1; content-visibility: visible; }
+
+/* a long jump crosses under the ground (src/ui/scroll.ts); the nav and the ring's bar stay over it */
+.veil { position: fixed; inset: 0; z-index: 39; background: var(--ground); opacity: 0; pointer-events: none; }
+/* on the way to a section, the veil names it: its number in the menu and its name, rising behind an edge (src/ui/scroll.ts) */
+.veil__card {
+  position: absolute; left: var(--margin); right: var(--margin); top: 50%; margin: 0;
+  transform: translateY(-50%); overflow: clip; padding-bottom: .12em;
+  font-family: var(--serif-display); font-weight: 400; font-size: clamp(44px, 11vw, 104px);
+  line-height: 1.02; letter-spacing: -.03em; color: var(--ink);
+}
+.veil__line { display: flex; align-items: baseline; gap: .38em; }
+.veil__line[hidden] { display: none; }
+.veil__n { font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .14em; color: var(--cobalt-on); }
+
+/* a change of theme: the new one spreads from the switch in a circle where
+   the browser can (src/ui/theme.ts), and cross-fades where it cannot */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+html.is-theming :is(*, *::before, *::after) {
+  transition: background-color var(--t-3) var(--e-out), color var(--t-3) var(--e-out), border-color var(--t-3) var(--e-out), fill var(--t-3) var(--e-out) !important;
+}
+
+/* the chrome is revealed by the intro timeline, never flashed before it. The
+   headline is not: it is the page's largest text and paints with the first
+   frame. A slow connection can hold the scripts back for seconds, though, and
+   a page with no way to book a demo looks broken: so if the intro has not
+   started by 1.6 s, the chrome appears on its own (and the intro, arriving
+   late, leaves it be: src/ui/intro.ts) */
+html.js:not(.is-ready) :is(.nav, .switch, .foot, .hero__kicker, .hero__p, .hero__cta, .hero__proof, .rail, .intro__cue) { opacity: 0; }
+html.js:not(.is-ready) :is(.nav, .foot, .hero__kicker, .hero__p, .hero__cta, .hero__proof, .rail, .intro__cue) {
+  animation: chrome-in var(--t-3) var(--e-out) 1.6s forwards;
+}
+/* the Rings / Spiral switch waits for the script: it has nothing to switch before the ring exists */
+@keyframes chrome-in { to { opacity: 1; } }
+/* The fixed chrome keeps its own layer for good. Without one, Chrome reports
+   a fixed box whose opacity layer comes or goes (as it does at either end of
+   a fade) as having jumped there from the top-left corner: one phantom move
+   of the footer was the page's entire layout shift. */
+.nav, .switch, .foot { will-change: opacity; }
+
+/* read by screen readers, not shown */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ------------------------------------------------------------- finish */
+/* Small things a careful page gets right: a selection in the accent, quiet
+   scrollbars on the panels that scroll, no word left alone on a line, and a
+   fine grain over everything. The grain is not decoration: on an 8-bit
+   screen the long dark gradients band into visible steps, and noise this
+   faint dithers them smooth. It is one small picture made ahead of time
+   (tools/grain.py) and repeated, not a noise filter the browser computes
+   while it paints, and it has plain alpha (a blend mode would be
+   recomposited every frame the ring moves). It lifts while a film plays so
+   the recording stays clean. */
+::selection { background: rgba(80,152,248,.38); color: #fff; }
+* { scrollbar-width: thin; scrollbar-color: rgba(226,232,245,.18) transparent; }
+p, li, dd, figcaption { text-wrap: pretty; }
+.grain {
+  position: fixed; inset: 0; z-index: 95; pointer-events: none;
+  background: url("./grain.png") 0 0 / 96px 96px repeat;
+  opacity: .05;
+  transition: opacity var(--t-3) var(--e-out);
+}
+body.is-flow-open .grain { opacity: 0; }
+:root[data-theme="light"] .grain { opacity: .035; }
+@media (forced-colors: active) { .grain { display: none; } }
+
+/* ------------------------------------------------------------ buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: 40px; padding: 0 18px; border-radius: var(--r-pill);
+  font-family: inherit; font-size: 14px; font-weight: 500; text-decoration: none; white-space: nowrap;
+  border: 1px solid transparent; cursor: pointer;
+  transition: background-color var(--t-2) var(--e-out), border-color var(--t-2) var(--e-out),
+              color var(--t-2) var(--e-out), box-shadow var(--t-2) var(--e-out), transform var(--t-1) var(--e-out);
+}
+.btn--lg { height: 46px; padding: 0 22px; font-size: 14.5px; }
+/* the primary pill has a lit top edge and a cobalt glow under it, which
+   strengthens on hover: it reads as a key, not a coloured rectangle */
+.btn--solid {
+  background: var(--cobalt); color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 1px 2px rgba(0,0,0,.4), 0 10px 26px -14px rgba(24,80,224,.9);
+}
+.btn--solid:hover {
+  background: var(--cobalt-hi);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.26), 0 1px 2px rgba(0,0,0,.4), 0 14px 34px -12px rgba(42,98,240,.95);
+}
+.btn--ghost { color: var(--ink); border-color: var(--line-2); background: var(--wash); box-shadow: var(--edge); }
+.btn--ghost:hover { border-color: var(--line-3); background: var(--wash-2); }
+.btn:active { transform: scale(.97); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: .45; pointer-events: none; }
+.btn--block { width: 100%; }
+.btn__i { width: 26px; height: 26px; padding: 7px; border-radius: var(--r-pill); background: rgba(255,255,255,.16); }
+
+/* ----------------------------------------------------------- fallback */
+/* the crawlable list of workflows, written into the HTML at build time.
+   Without scripts, or without WebGL, there is no ring, and the home view
+   becomes an ordinary page: the headline, then the twelve workflows as
+   cards, each a link to its own page, where its film plays either way.
+   Controls that need a script to do anything are not shown. */
+.seo {
+  position: fixed; z-index: 0; left: 0; top: 0;
+  width: 100%; margin: 0; padding: 0; list-style: none;
+  opacity: 0; pointer-events: none;
+}
+:is(html:not(.js), html.no-webgl) .hero {
+  position: relative; left: auto; bottom: auto; width: auto; max-width: 760px;
+  margin: clamp(116px, 15vh, 170px) var(--margin) 0;
+}
+:is(html:not(.js), html.no-webgl) .seo {
+  position: relative; z-index: 2; opacity: 1; pointer-events: auto;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 12px;
+  width: auto; max-width: 1240px; margin: clamp(44px, 6vw, 72px) auto 0; padding: 0 var(--margin) 120px;
+}
+:is(html:not(.js), html.no-webgl) .seo__item {
+  display: block; height: 100%; padding: 22px 22px 24px;
+  border: 1px solid var(--line-2); border-radius: var(--r-card); background: var(--surface);
+  transition: border-color var(--t-2) var(--e-out);
+}
+:is(html:not(.js), html.no-webgl) .seo__item:hover { border-color: var(--line-3); }
+:is(html:not(.js), html.no-webgl) .seo__item span { display: block; margin: 6px 0 0; }
+/* no ring, so no stage to light it, and the bars get a ground of their own
+   for the page to scroll under */
+:is(html:not(.js), html.no-webgl) .stage { display: none; }
+:is(html:not(.js), html.no-webgl) .nav { background: linear-gradient(to bottom, rgb(var(--ground-rgb) / .97) 60%, rgb(var(--ground-rgb) / 0)); }
+:is(html:not(.js), html.no-webgl) .foot { display: none; }
+html:not(.js) .theme { display: none; }
+:is(html:not(.js), html.no-webgl) .switch,
+html:not(.js) :is(.foot__pause, .rfoot__pause, .flow__play, .flow__ctrl, .flow__track) { display: none; }
+/* with the ring running, the list is still the keyboard's way in: tabbing
+   into it brings it up as a panel, so focus never lands on something unseen */
+html.js:not(.no-webgl) .seo:focus-within {
+  position: fixed;
+  z-index: 70; opacity: 1; pointer-events: auto;
+  left: var(--margin); top: 84px; width: min(440px, calc(100vw - 2 * var(--margin)));
+  max-height: calc(100vh - 120px); overflow-y: auto;
+  display: grid; gap: 2px; padding: 12px;
+  border: 1px solid var(--line-2); border-radius: 18px; background: var(--surface);
+}
+html.js:not(.no-webgl) .seo:focus-within .seo__item { display: block; padding: 8px 10px; border-radius: 10px; font-size: 17px; }
+html.js:not(.no-webgl) .seo:focus-within .seo__item p { display: none; }
+.seo__item { color: var(--ink); text-decoration: none; font-family: var(--serif); font-size: 22px; }
+.seo__item span { color: var(--ink-3); font-family: var(--font); font-size: 13px; margin-left: 10px; }
+.seo__item p { margin: 4px 0 0; font-family: var(--font); font-size: 14px; color: var(--ink-2); max-width: 60ch; }
+
+/* ------------------------------------------------------ reduced motion */
+/* (a revealed block keeps its brief fade: styles/routes.css) */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.rv) {
+    animation-duration: .001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    transition-delay: 0ms !important;
+  }
+}

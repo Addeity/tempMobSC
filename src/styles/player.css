@@ -1,0 +1,130 @@
+/* The workflow player: what a card opens. DOM, not WebGL, so the steps are
+   selectable, announced, and there without the 3D layer. Its entrance and
+   exit are choreographed in src/ui/player.ts; CSS holds the resting state. */
+/* closed, it is not laid out at all; it closes on the timeline's last frame */
+.flow { position: fixed; inset: 0; z-index: 66; visibility: hidden; pointer-events: none; content-visibility: hidden; }
+.flow.is-open { visibility: visible; pointer-events: auto; content-visibility: visible; }
+
+/* a modal backdrop: the blur says the ring is behind you, not gone. Only
+   once the live ring is drawn: before that the stage holds its stand-in,
+   already soft, and a full-screen blur in the first paint of a film's own
+   address is costly for nothing (without a GPU it held that paint back) */
+.flow__scrim { position: absolute; inset: 0; background: rgba(3,4,8,.74); }
+html.ring-on .flow__scrim { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+.flow__inner {
+  position: absolute; inset: clamp(10px, 2vw, 26px);
+  display: flex; flex-direction: column;
+  padding: clamp(16px, 2.2vw, 30px) clamp(16px, 2.6vw, 38px) clamp(20px, 2.6vw, 36px);
+  overflow-y: auto; overscroll-behavior: contain;
+  isolation: isolate;
+}
+.flow__inner:focus { outline: none; }
+.flow__surface {
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: 28px; background: var(--ground-2); border: 1px solid var(--line-2);
+}
+
+.flow__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.flow__kicker {
+  margin: 0; display: flex; align-items: baseline; gap: 8px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+}
+.flow__idx { color: var(--ink); font-variant-numeric: tabular-nums; }
+.flow__of { color: var(--ink-3); font-variant-numeric: tabular-nums; margin-right: 10px; }
+.flow__cat { color: var(--cobalt-on); }
+.flow__ctrl { display: flex; gap: 8px; }
+.flow__btn {
+  width: 40px; height: 40px; display: grid; place-items: center;
+  border-radius: var(--r-pill); border: 1px solid var(--line-2);
+  background: var(--wash); color: var(--ink); cursor: pointer;
+  transition: border-color var(--t-2) var(--e-out), background-color var(--t-2) var(--e-out), transform var(--t-1) var(--e-out);
+}
+.flow__btn:hover { border-color: var(--line-3); background: var(--wash-2); }
+.flow__btn:active { transform: scale(.94); }
+.flow__btn svg { width: 18px; height: 18px; }
+
+.flow__grid {
+  flex: 1; display: grid; align-items: center;
+  grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr);
+  gap: clamp(22px, 3.2vw, 56px);
+  margin-top: clamp(14px, 2vw, 22px);
+}
+.flow__media { margin: 0; min-width: 0; }
+.flow__screen {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+  border-radius: var(--r-screen); border: 1px solid var(--line-2);
+  background: #0b0f18;
+  box-shadow: 0 50px 90px -50px rgba(0,0,0,.9);
+  transform-origin: 0 0;
+}
+/* the card's own frame, drawn the instant the player opens, so the screen
+   is never empty while the film loads over it */
+.flow__snap { position: absolute; inset: 0; width: 100%; height: 100%; }
+.flow__video { position: relative; display: block; width: 100%; height: 100%; object-fit: cover; background: transparent; }
+
+.flow__play {
+  position: absolute; right: 14px; bottom: 14px;
+  width: 42px; height: 42px; display: grid; place-items: center;
+  border-radius: var(--r-pill); border: 1px solid rgba(255,255,255,.18);
+  background: rgba(5,7,12,.78); color: #fff; cursor: pointer;
+  transition: transform var(--t-1) var(--e-out), background-color var(--t-2) var(--e-out);
+}
+.flow__play:hover { background: rgba(5,7,12,.92); }
+.flow__play:active { transform: scale(.94); }
+.flow__play-i { width: 18px; height: 18px; fill: none; }
+.flow__play-i--play { display: none; }
+.flow__play[data-state="paused"] .flow__play-i--play { display: block; }
+.flow__play[data-state="paused"] .flow__play-i--pause { display: none; }
+
+/* one segment per step, sized to its share of the film: done segments are
+   ink, the one playing fills in amber, the rest wait */
+.flow__track { display: flex; gap: 4px; height: 3px; margin-top: 16px; }
+.flow__seg { position: relative; flex: var(--w) 1 0; overflow: hidden; border-radius: 2px; background: var(--line-2); }
+.flow__seg > i { position: absolute; inset: 0; background: var(--ink); transform: scaleX(var(--p, 0)); transform-origin: 0 50%; }
+.flow__seg.is-active > i { background: var(--amber); }
+.flow__meta {
+  display: flex; justify-content: space-between; gap: 12px; margin-top: 10px;
+  font-family: var(--mono); font-size: 11.5px; letter-spacing: .04em; color: var(--ink-3);
+}
+.flow__time { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+
+.flow__copy { min-width: 0; }
+.flow__h {
+  margin: 0; font-family: var(--serif); font-weight: 400;
+  font-size: clamp(28px, 2.9vw, 46px); line-height: 1.04; letter-spacing: -.018em; text-wrap: balance;
+}
+.flow__lede { margin: 14px 0 0; color: var(--ink-2); font-size: 15.5px; line-height: 1.6; max-width: 46ch; }
+.flow__steps { list-style: none; margin: 22px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.flow__steps li { position: relative; border-bottom: 1px solid var(--line); }
+/* the amber bar marks the step the film is on */
+.flow__steps li::before {
+  content: ""; position: absolute; left: -14px; top: 14px; bottom: 14px; width: 2px; border-radius: 2px;
+  background: var(--amber); transform: scaleY(0); transform-origin: 50% 0;
+  transition: transform var(--t-2) var(--e-out);
+}
+.flow__steps li.is-active::before { transform: scaleY(1); }
+.flow__step {
+  width: 100%; display: grid; grid-template-columns: 50px 1fr; gap: 12px; align-items: baseline;
+  padding: 13px 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer;
+  font: inherit; border-radius: 8px;
+}
+.flow__n { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; transition: color var(--t-2) var(--e-out); }
+.flow__b { display: grid; gap: 2px; }
+.flow__st { font-weight: 500; font-size: 15px; color: var(--ink-2); transition: color var(--t-2) var(--e-out); }
+.flow__sd { color: var(--ink-3); font-size: 13.5px; line-height: 1.5; }
+.flow__step:hover .flow__st { color: var(--ink); }
+.flow__steps li.is-done .flow__n { color: var(--ink-2); }
+.flow__steps li.is-active .flow__n { color: var(--amber); }
+.flow__steps li.is-active .flow__st { color: var(--ink); }
+.flow__note { margin: 18px 0 0; color: var(--ink-3); font-size: 13px; line-height: 1.55; max-width: 48ch; }
+
+@media (max-width: 1100px) {
+  .flow__grid { grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .flow__copy { max-width: 720px; }
+}
+@media (max-width: 640px) {
+  .flow__inner { inset: 0; padding: 14px 16px 28px; }
+  .flow__surface { border-radius: 0; border: 0; }
+  .flow__steps li::before { left: -10px; }
+}

@@ -1,0 +1,6 @@
+# How to report a security problem in the OwnAI website or product.
+# Please describe the problem; do not send customer data.
+Contact: mailto:hello@ownai.example
+Expires: 2027-10-29T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://ownai.example/.well-known/security.txt

@@ -1,0 +1,57 @@
+/* The ring's stage: fixed behind the intro. As the tour's sheet rises over
+   it, it sinks back a little and dims, the way a page settles behind a sheet
+   laid over it (src/app.ts writes its scale, fade and corners each frame). */
+.stage {
+  position: fixed; inset: 0; z-index: 1;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+/* While three.js is on its way (a second on a good line, many on a slow one)
+   the stage holds the ring's seed: the chrome ring alone, sharp, exactly as
+   the intro's first frame will draw it, at the place and size the camera
+   will give it (tools/seed.ts drew it and measured both, for each layout in
+   src/scene/layout.ts). The live ring holds that first frame while it fades
+   in over the seed, so the change cannot be seen; then the camera comes in
+   and the cards fly out from it. */
+.stage__seed {
+  --seed-y: 43.91; --seed-h: 5.79;   /* a phone: the middle, and the height, in % of the screen's height */
+  position: absolute; left: 50%; top: calc(var(--seed-y) * 1%);
+  height: calc(var(--seed-h) * 1% * 244 / 240); aspect-ratio: 268 / 244;   /* the picture has 2px to spare each side */
+  transform: translate(-50%, -50%);
+  background: url("../scene/ring-seed.webp") center / contain no-repeat;
+}
+@media (min-width: 500px) { .stage__seed { --seed-y: 45.01; --seed-h: 6.258; } }
+@media (min-width: 768px) and (orientation: portrait) { .stage__seed { --seed-y: 44.6; --seed-h: 7.721; } }
+@media (min-width: 768px) and (orientation: landscape) { .stage__seed { --seed-y: 45.27; --seed-h: 9.396; } }
+@media (min-width: 1024px) { .stage__seed { --seed-y: 44.9; --seed-h: 12.011; } }
+/* once the live ring covers it, it goes; without the ring, or with reduced
+   motion (where the ring starts at its full size, not the seed's), it never shows */
+html.ring-on .stage__seed { visibility: hidden; transition: visibility 0s var(--t-2); }
+:is(html:not(.js), html.no-webgl) .stage__seed { display: none; }
+@media (prefers-reduced-motion: reduce) { .stage__seed { display: none; } }
+
+/* the canvas shows nothing until its first frame is drawn, then fades in over
+   the seed; it keeps its own layer so the fade never registers as a layout shift */
+.scene {
+  position: relative; display: block; width: 100%; height: 100%;
+  opacity: 0; will-change: opacity; transition: opacity var(--t-2) var(--e-out);
+}
+html.ring-on .scene { opacity: 1; }
+html.no-webgl .scene { display: none; }
+
+/* The cylinder is cut off top and bottom; these fade it into the ground.
+   The lower one is taller and heavier because the hero sits on it. */
+.vig { position: absolute; left: 0; right: 0; z-index: 6; pointer-events: none; }
+.vig--top {
+  top: 0; height: 20vh;
+  background: linear-gradient(to bottom, var(--ground) 0%, rgb(var(--ground-rgb) / .7) 45%, rgb(var(--ground-rgb) / 0) 100%);
+}
+.vig--bot {
+  bottom: 0; height: 46vh;
+  background: linear-gradient(to top, var(--ground) 0%, rgb(var(--ground-rgb) / .94) 26%, rgb(var(--ground-rgb) / .7) 52%, rgb(var(--ground-rgb) / .28) 78%, rgb(var(--ground-rgb) / 0) 100%);
+}
+
+@media (max-width: 640px) {
+  .vig--bot { height: 60vh; }
+}

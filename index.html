@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>{{name}}</title>
+<meta name="description" content="{{summary}}" />
+<!--page-meta-->
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#05070c" />
+<meta name="apple-mobile-web-app-title" content="{{name}}" />
+<link rel="icon" href="/favicon.ico" sizes="32x32" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+<script>(function(d){d.classList.add('js');if(!('WebGL2RenderingContext' in window))d.classList.add('no-webgl');var t;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';d.setAttribute('data-theme',t);if(t==='light')document.querySelector('meta[name=theme-color]').setAttribute('content','#f2f3f6')})(document.documentElement)</script>
+</head>
+<body>
+<a class="skip" href="#main" data-skip>Skip to content</a>
+
+<div class="stage" id="stage">
+  <div class="stage__seed" aria-hidden="true"></div>
+  <canvas class="scene" id="scene" aria-hidden="true"></canvas>
+  <div class="vig vig--top" aria-hidden="true"></div>
+  <div class="vig vig--bot" aria-hidden="true"></div>
+</div>
+
+<header class="nav" id="nav">
+  <a class="nav__logo" href="/" aria-label="{{name}}, home">
+    <span class="nav__mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none"><path d="{{markPath}}" stroke="currentColor" stroke-width="2.4"/></svg>
+    </span>
+    <span class="nav__name">{{name}}</span>
+  </a>
+  <nav class="nav__links" aria-label="Primary">
+    <!--nav-links-->
+  </nav>
+  <div class="nav__end">
+    <button class="theme" id="themeToggle" type="button" aria-label="Light theme" aria-pressed="false">
+      <svg class="theme__i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true">
+        <circle class="theme__sun" cx="12" cy="12" r="4.2"/>
+        <path class="theme__rays" d="M12 2.8v2.1M12 19.1v2.1M4.9 4.9l1.5 1.5M17.6 17.6l1.5 1.5M2.8 12h2.1M19.1 12h2.1M4.9 19.1l1.5-1.5M17.6 6.4l1.5-1.5"/>
+        <path class="theme__moon" d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.6 7.6 0 1 0 10.1 10.1z"/>
+      </svg>
+    </button>
+    <a class="btn btn--ghost" href="{{appUrl}}">Log in</a>
+    <a class="btn btn--solid" href="/contact/">Book a demo</a>
+    <button class="nav__menu" type="button" aria-expanded="false" aria-controls="menu">
+      <span class="nav__menu-i" aria-hidden="true"></span><span class="nav__menu-t">Menu</span>
+    </button>
+  </div>
+</header>
+
+<!--menu-->
+
+
+<main id="main">
+<section class="intro" id="top" data-section="home" aria-labelledby="heroTitle">
+  <div class="intro__pin">
+    <div class="hero" id="hero">
+    <p class="hero__kicker">{{descriptor}}</p>
+    <h1 class="hero__h" id="heroTitle">{{tagline}}</h1>
+    <p class="hero__p">Documents, a cited assistant, projects, time and clients in one workroom, on hardware you control. Scroll to turn the ring, or open any screen on it to watch it run.</p>
+    <div class="hero__cta">
+      <a class="btn btn--solid btn--lg" href="/contact/">Book a demo</a>
+      <a class="btn btn--ghost btn--lg" href="{{firstFlow}}" data-flow="{{firstKey}}">Watch the first one</a>
+    </div>
+    <!--hero-proof-->
+  </div>
+    <div class="intro__say intro__say--1" aria-hidden="true"><p class="intro__say-k">{{count}} workflows</p><p class="intro__say-t">Every screen on the ring is {{name}} at work, recorded as it ran.</p></div>
+    <div class="intro__say intro__say--2" aria-hidden="true"><p class="intro__say-k">Next</p><p class="intro__say-t">Watch them run, one at a time, step by step.</p></div>
+    <div class="rail" aria-hidden="true">
+      <span class="rail__k">Start</span>
+      <span class="rail__bar"><i class="rail__fill"></i></span>
+      <span class="rail__k">End</span>
+    </div>
+    <p class="intro__cue" aria-hidden="true"><span class="intro__cue-line"></span>Scroll</p>
+  </div>
+</section>
+
+<!-- the ring's own control, inside the main landmark with the ring it arranges (it is fixed in place, so where it sits here changes nothing on screen) -->
+<div class="switch" id="layoutSwitch" role="group" aria-label="Card arrangement">
+  <span class="switch__pill" aria-hidden="true"></span>
+  <button class="switch__btn is-active" type="button" data-layout="rings" aria-pressed="true">Rings</button>
+  <button class="switch__btn" type="button" data-layout="spiral" aria-pressed="false">Spiral</button>
+</div>
+
+<!-- the workflows as text, written in at build time from @site/content:
+     crawlable, and the page itself when WebGL is unavailable -->
+<ul class="seo" id="seo" tabindex="-1" aria-label="The {{count}} workflows"><!--workflow-list--></ul>
+
+<!--tour-->
+
+<!--panel:platform-->
+
+<!--panel:customers-->
+
+<section class="sec" id="pricing" data-section="pricing" aria-labelledby="pricingTitle">
+  <div class="sec__inner">
+    <div class="route__head">
+      <p class="route__kicker rv">Self-hosted, priced per company</p>
+      <h2 class="route__h rv rv--lines" id="pricingTitle">Priced per firm, not per question.</h2>
+      <p class="route__lede rv">
+        Every plan is the same product running on your own server. You are choosing how many
+        people it serves and how much it can index, not which features we switch off.
+      </p>
+      <div class="billing rv" role="group" aria-label="Billing period" id="billing">
+        <button type="button" class="is-on" data-period="mo" aria-pressed="true">Monthly</button>
+        <button type="button" data-period="yr" aria-pressed="false">Annual <span class="billing__save">2 months free</span></button>
+      </div>
+    </div>
+
+    <div class="plans swipe" id="plans">
+      <article class="plan rv">
+        <h2 class="plan__name">Starter</h2>
+        <p class="plan__for">A small team getting its documents into one place.</p>
+        <p class="plan__price"><span class="plan__amt" data-mo="49" data-yr="41">$49</span><span class="plan__per">/ month</span></p>
+        <p class="plan__note" data-note-mo="billed monthly" data-note-yr="billed annually">billed monthly</p>
+        <a class="btn btn--ink plan__cta" href="/contact/">Book a demo</a>
+        <ul class="plan__list">
+          <li>Up to 15 people</li>
+          <li>50 GB document index</li>
+          <li>Assistant with citations</li>
+          <li>Projects, 12 views</li>
+          <li>Time tracking and leave</li>
+          <li class="muted">Clients, invoices and VAT</li>
+          <li class="muted">Writing studio</li>
+        </ul>
+      </article>
+      <article class="plan plan--featured rv">
+        <span class="plan__badge">Most chosen</span>
+        <h2 class="plan__name">Studio</h2>
+        <p class="plan__for">An agency running several clients through one workroom.</p>
+        <p class="plan__price"><span class="plan__amt" data-mo="149" data-yr="124">$149</span><span class="plan__per">/ month</span></p>
+        <p class="plan__note" data-note-mo="billed monthly" data-note-yr="billed annually">billed monthly</p>
+        <a class="btn btn--ink plan__cta" href="/contact/">Book a demo</a>
+        <ul class="plan__list">
+          <li>Up to 40 people</li>
+          <li>300 GB document index</li>
+          <li>Everything in Starter</li>
+          <li>Clients, invoices, credit notes, VAT</li>
+          <li>Expenses and profit per period</li>
+          <li>Writing studio with voice profiles</li>
+          <li>GitHub and Slack integrations</li>
+        </ul>
+      </article>
+      <article class="plan rv">
+        <h2 class="plan__name">Firm</h2>
+        <p class="plan__for">A full firm with departments, custom roles and audit needs.</p>
+        <p class="plan__price"><span class="plan__amt" data-mo="349" data-yr="291">$349</span><span class="plan__per">/ month</span></p>
+        <p class="plan__note" data-note-mo="billed monthly" data-note-yr="billed annually">billed monthly</p>
+        <a class="btn btn--ink plan__cta" href="/contact/">Book a demo</a>
+        <ul class="plan__list">
+          <li>Up to 100 people</li>
+          <li>1 TB document index</li>
+          <li>Everything in Studio</li>
+          <li>Custom roles and permissions</li>
+          <li>Full audit trail and security log</li>
+          <li>Backup verification</li>
+          <li>Priority support</li>
+        </ul>
+      </article>
+      <article class="plan rv">
+        <h2 class="plan__name">Hosting</h2>
+        <p class="plan__for">For providers running {{name}} for many client companies.</p>
+        <p class="plan__price"><span class="plan__amt">Custom</span></p>
+        <p class="plan__note">per company, per year</p>
+        <a class="btn btn--ink plan__cta" href="/contact/">Book a demo</a>
+        <ul class="plan__list">
+          <li>One install, many companies</li>
+          <li>Database per company</li>
+          <li>Super-admin console</li>
+          <li>Plan limits: people, storage, tokens</li>
+          <li>Access log visible to each company</li>
+          <li>White-label branding</li>
+          <li>Onboarding and migration help</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="dots plans__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <p class="route__fine">Prices shown are placeholders for review. Set final numbers before publishing.</p>
+
+    <h2 class="route__sub rv rv--lines">What each plan includes</h2>
+    <div class="pick" role="group" aria-label="The plan the table shows">
+      <span class="pick__pill" aria-hidden="true"></span>
+      <button type="button" data-col="2" aria-pressed="false" aria-controls="planTable">Starter</button>
+      <button type="button" data-col="3" aria-pressed="true" aria-controls="planTable">Studio</button>
+      <button type="button" data-col="4" aria-pressed="false" aria-controls="planTable">Firm</button>
+      <button type="button" data-col="5" aria-pressed="false" aria-controls="planTable">Hosting</button>
+    </div>
+    <div class="sheet rv rv--clip" id="planTable" data-col="3">
+      <div class="sheet__scroll" tabindex="0" role="region" aria-label="What each plan includes">
+        <table class="ctable ctable--plans">
+          <thead>
+            <tr><th scope="col">Capability</th><th scope="col">Starter</th><th scope="col">Studio</th><th scope="col">Firm</th><th scope="col">Hosting</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">People</th><td>15</td><td>40</td><td>100</td><td>Per company</td></tr>
+            <tr><th scope="row">Document index</th><td>50 GB</td><td>300 GB</td><td>1 TB</td><td>Configurable</td></tr>
+            <tr><th scope="row">Cited assistant</th><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Projects and 12 views</th><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Time tracking and leave</th><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Clients, invoices, VAT</th><td class="no"><span class="sr">Not included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Writing studio</th><td class="no"><span class="sr">Not included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Custom roles</th><td class="no"><span class="sr">Not included</span></td><td class="no"><span class="sr">Not included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Full audit trail</th><td class="no"><span class="sr">Not included</span></td><td class="no"><span class="sr">Not included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Multi-company console</th><td class="no"><span class="sr">Not included</span></td><td class="no"><span class="sr">Not included</span></td><td class="no"><span class="sr">Not included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+            <tr><th scope="row">Local model support</th><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td><td class="yes"><span class="sr">Included</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!--proof-band-->
+
+    <h2 class="route__sub rv rv--lines">Pricing questions</h2>
+    <div class="qa">
+      <details class="qa__i rv">
+        <summary class="qa__q"><span class="qa__wash" aria-hidden="true"></span>Is this per user or per company?<span class="qa__x" aria-hidden="true"></span></summary>
+        <div class="qa__b"><p>Per company, with a seat ceiling rather than a per-seat charge. Adding the tenth person should not feel like a decision.</p></div>
+      </details>
+      <details class="qa__i rv">
+        <summary class="qa__q"><span class="qa__wash" aria-hidden="true"></span>Who runs the server?<span class="qa__x" aria-hidden="true"></span></summary>
+        <div class="qa__b"><p>You do. Your hardware, your VPS, or a provider running it on your behalf. We are not in the data path.</p></div>
+      </details>
+      <details class="qa__i rv">
+        <summary class="qa__q"><span class="qa__wash" aria-hidden="true"></span>What does the AI cost on top?<span class="qa__x" aria-hidden="true"></span></summary>
+        <div class="qa__b"><p>Nothing extra if you run a local model on your own hardware. If you connect a cloud model, you pay that provider directly at their rates.</p></div>
+      </details>
+      <details class="qa__i rv">
+        <summary class="qa__q"><span class="qa__wash" aria-hidden="true"></span>Is there a free tier?<span class="qa__x" aria-hidden="true"></span></summary>
+        <div class="qa__b"><p>Not a permanent one. We run guided demos on your own documents so you can judge it on your material rather than a sample.</p></div>
+      </details>
+    </div>
+
+    <div class="route__cta rv rv--clip">
+      <h2 class="route__cta-h">Not sure which plan fits?</h2>
+      <p class="route__cta-p">Tell us how many people and how many documents. We will tell you honestly which tier is right, including if it is the cheapest one.</p>
+      <div class="route__btns">
+        <a class="btn btn--solid" href="/contact/">Book a demo</a>
+        <a class="btn btn--ghost" href="/">Back to the ring</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--panel:company-->
+
+<!-- the last section and the footer band: the band is pinned under the section and revealed as it lifts away -->
+<div class="end">
+<section class="sec" id="contact" data-section="contact" aria-labelledby="contactTitle">
+  <div class="sec__inner">
+    <div class="route__head">
+      <p class="route__kicker rv">We reply within one working day</p>
+      <h2 class="route__h rv rv--lines" id="contactTitle">Show us the documents you actually work with.</h2>
+      <p class="route__lede rv">
+        The useful demo is not a slide deck. It is your own files, in your own workroom, with
+        citations you can open. Tell us a little and we will set that up.
+      </p>
+    </div>
+
+    <div class="contact__grid">
+      <form class="form sheet rv rv--clip" id="contactForm" novalidate><!--form-target-->
+        <div class="hp" aria-hidden="true">
+          <label for="c-website">Leave this empty</label>
+          <input id="c-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+        <div class="form__row">
+          <div class="field">
+            <label for="c-name">Your name</label>
+            <input id="c-name" name="name" type="text" autocomplete="name" required />
+            <span class="field__err" data-err-for="c-name"></span>
+          </div>
+          <div class="field">
+            <label for="c-email">Work email</label>
+            <input id="c-email" name="email" type="email" autocomplete="email" required />
+            <span class="field__err" data-err-for="c-email"></span>
+          </div>
+        </div>
+        <div class="form__row">
+          <div class="field">
+            <label for="c-company">Company</label>
+            <input id="c-company" name="company" type="text" autocomplete="organization" required />
+            <span class="field__err" data-err-for="c-company"></span>
+          </div>
+          <div class="field">
+            <label for="c-size">Team size</label>
+            <select id="c-size" name="size">
+              <option>1&ndash;5</option>
+              <option selected>6&ndash;15</option>
+              <option>16&ndash;40</option>
+              <option>41&ndash;100</option>
+              <option>More than 100</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="c-topic">What brings you here?</label>
+          <select id="c-topic" name="topic">
+            <option selected>Book a demo on our own documents</option>
+            <option>Self-host it (early access)</option>
+            <option>Run it for multiple client companies</option>
+            <option>Pricing question</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="c-msg">Anything we should know?</label>
+          <textarea id="c-msg" name="message" rows="4" placeholder="How many documents, which systems you use today, anything that has to stay put."></textarea>
+        </div>
+        <button class="btn btn--solid btn--block" type="submit">
+          Send message
+          <svg class="btn__i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M19 5H8M19 5v11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <p class="form__msg" id="contactMsg" role="status" aria-live="polite"></p>
+        <p class="form__fine">We do not add you to a mailing list. No newsletter, no drip sequence. What happens to what you send is in our <a href="/legal/privacy/">privacy notice</a>.</p>
+      </form>
+
+      <div class="info rv">
+        <!--booking-->
+        <div class="info__c">
+          <span class="info__i" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m4.5 7 7.5 5.6L19.5 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+          <div><p class="info__k">Email</p><p class="info__v"><a href="mailto:{{email}}">{{email}}</a></p></div>
+        </div>
+        <div class="info__c">
+          <span class="info__i" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.4V12l3 2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <div><p class="info__k">Response time</p><p class="info__v">Within one working day.</p></div>
+        </div>
+        <div class="info__c">
+          <span class="info__i" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 20 7v6c0 4.2-3.3 6.6-8 7.5-4.7-.9-8-3.3-8-7.5V7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="m9 12 2.2 2.2L15.4 10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><p class="info__k">For security reviews</p><p class="info__v">Ask for the data-flow document. It lists every component and what it sends, matching the table on the pricing page.</p></div>
+        </div>
+        <div class="info__c">
+          <span class="info__i" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 9.5h17M8 4.5v15" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></span>
+          <div><p class="info__k">Existing customer?</p><p class="info__v">Accounts are provisioned by your administrator. Ask them to add you.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!--route-foot-->
+</div>
+
+</main>
+
+<!--panel:legal-->
+
+<section class="route route--missing" id="missing" data-route="missing" aria-hidden="true" aria-labelledby="missingTitle">
+  <div class="route__inner">
+    <div class="route__head">
+      <p class="route__kicker rv">Nothing at this address</p>
+      <h1 class="route__h rv rv--lines" id="missingTitle">This page is not here.</h1>
+      <p class="route__lede rv">It may have moved, or the link was mistyped. Every workflow is on the ring, and every part of the site is on one page.</p>
+      <div class="route__btns rv">
+        <a class="btn btn--solid" href="/">Back to the ring</a>
+        <a class="btn btn--ghost" href="/contact/">Contact us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="label" id="label" aria-hidden="true">
+  <span class="label__pill label__pill--main">
+    <span class="label__title" id="labelTitle"></span>
+    <span class="label__cat" id="labelCat"></span>
+  </span>
+  <span class="label__pill label__pill--cue">
+    <span>Click to watch</span>
+    <svg class="label__arrow" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+      <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+</div>
+
+<footer class="foot" id="foot">
+  <span class="foot__item foot__line">On hardware you control</span>
+  <span class="foot__item foot__mid"><span class="foot__sel" id="footSel">01 / 12</span> workflows</span>
+  <span class="foot__item foot__line foot__end">
+    <button class="foot__pause" id="motionToggle" type="button" aria-pressed="false">
+      <span class="foot__pause-i" aria-hidden="true"></span><span class="foot__pause-t">Pause motion</span>
+    </button>
+    <a class="foot__link" href="/legal/">Legal</a>
+    <span>&copy; {{year}} {{legalName}}</span>
+  </span>
+</footer>
+
+<aside class="flow" id="flow" aria-hidden="true">
+  <div class="flow__scrim" data-flow-close></div>
+  <div class="flow__inner" role="dialog" aria-modal="true" aria-labelledby="flowTitle" tabindex="-1">
+    <div class="flow__surface" aria-hidden="true"></div>
+    <div class="flow__top">
+      <p class="flow__kicker"><span class="flow__idx" id="flowIndex">01</span><span class="flow__of" id="flowOf">/ 12</span><span class="flow__cat" id="flowCat"></span></p>
+      <div class="flow__ctrl">
+        <button class="flow__btn" type="button" data-flow-go="-1" aria-label="Previous workflow">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="flow__btn" type="button" data-flow-go="1" aria-label="Next workflow">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="flow__btn flow__close" type="button" data-flow-close aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="flow__grid">
+      <figure class="flow__media">
+        <div class="flow__screen" id="flowScreen">
+          <canvas class="flow__snap" id="flowSnap" width="640" height="360" aria-hidden="true"></canvas>
+          <video class="flow__video" id="flowVideo" muted playsinline loop preload="none"></video>
+          <button class="flow__play" id="flowPlay" type="button" aria-label="Pause film">
+            <svg class="flow__play-i flow__play-i--pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13M16 5.5v13" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <svg class="flow__play-i flow__play-i--play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.8v12.4a.6.6 0 0 0 .9.5l10-6.2a.6.6 0 0 0 0-1L8.9 5.3a.6.6 0 0 0-.9.5z" fill="currentColor"/></svg>
+          </button>
+        </div>
+        <div class="flow__track" id="flowTrack" aria-hidden="true"></div>
+        <figcaption class="flow__meta">
+          <span class="flow__time"><span id="flowTime">0:00</span> / <span id="flowDur">0:00</span></span>
+          <span>Recorded in {{name}}</span>
+        </figcaption>
+      </figure>
+      <div class="flow__copy">
+        <h2 class="flow__h" id="flowTitle"></h2>
+        <p class="flow__lede" id="flowLede"></p>
+        <ol class="flow__steps" id="flowSteps"></ol>
+        <p class="flow__note" id="flowNote"></p>
+      </div>
+    </div>
+  </div>
+</aside>
+
+
+
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+
+<script>(function(d){var r=d.getAttribute('data-route'),e=r&&document.getElementById(r),s,i;if(!e||!e.classList.contains('sec'))return;s=document.querySelectorAll('.sec');for(i=0;i<s.length&&s[i]!==e;i++){s[i].style.contentVisibility='hidden';s[i].setAttribute('data-frozen','')}e.scrollIntoView()})(document.documentElement)</script>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+/* On paper. Buyers print the pricing and the security pages, or save them
+   as PDF for a review. On paper the page is the whole page in plain order
+   (the headline, the workflows with their steps, every section), or a
+   film's steps when one is open, set in ink on white, every answer open
+   (src/ui/print.ts), links spelled out. */
+@media print {
+  @page { margin: 16mm 14mm; }
+
+  html, body { height: auto !important; overflow: visible !important; background: #fff !important; }
+  *, *::before, *::after {
+    color: #111 !important; background: transparent !important; box-shadow: none !important; text-shadow: none !important;
+    animation: none !important; transition: none !important;
+  }
+  :root { --line: #ddd; --line-2: #ccc; --line-3: #bbb; }
+
+  /* the chrome and the scene have no meaning on paper */
+  .stage, .grain, .nav, .foot, .switch, .label, .cursor, .skip, .menu, .rfoot, .hero__cta, .hero__proof,
+  .route__btns, .billing, .book, .info__c--book, .flow__ctrl, .flow__play, .flow__track, .flow__scrim,
+  .hp, .tag, .qa__wash, .qa__x, .theme, .veil, .seo, .menu-scrim, .tour__steer, .plans__dots,
+  .intro__say, .rail, .intro__cue, .tour__index, .tour__skip, .tour__media, .tour__open, .tour__count { display: none !important; }
+
+  /* a film or the not-found notice, when one is open, is the page; otherwise the page is */
+  .route, .flow { display: none !important; }
+  .route.is-open, html[data-route="missing"] .route, .flow.is-open {
+    display: block !important; position: static !important; inset: auto !important; overflow: visible !important;
+    visibility: visible !important; opacity: 1 !important; content-visibility: visible !important;
+  }
+  body:is(.is-route-open, .is-flow-open) main { display: none !important; }
+  .rv { opacity: 1 !important; transform: none !important; translate: none !important; animation: none !important; }
+
+  /* the top of the page: the headline */
+  .intro, .intro__pin, .tour, .tour__pin, .tour__slides {
+    position: static !important; height: auto !important; margin: 0 !important; padding: 0 !important;
+    overflow: visible !important; transform: none !important; display: block !important; border-radius: 0 !important;
+  }
+  .tour__pin > * { transform: none !important; }
+  .hero { position: static !important; width: auto !important; max-width: none !important; margin: 0 0 8mm !important; opacity: 1 !important; transform: none !important; }
+  .hero > * { opacity: 1 !important; transform: none !important; }
+  /* the workflows, each with its steps written out */
+  .tour__slide { display: block !important; position: static !important; margin: 0 0 7mm !important; break-inside: avoid; }
+  .tour__h .w, .tour__h .w__i { display: inline !important; transform: none !important; }
+  .tour__steps { display: block !important; padding: 0 !important; }
+  .tour__step { height: auto !important; margin: 0 0 2mm !important; }
+  .tour__say { position: static !important; width: auto !important; opacity: 1 !important; transform: none !important; }
+  .tour__sd { display: block !important; -webkit-line-clamp: none !important; }
+  .tour__fill { display: none !important; }
+  .sec__inner { padding: 10mm 0 0 !important; }
+  .sec { border: 0 !important; }
+
+  /* the film: its words, which are the point of it on paper */
+  .flow.is-open .flow__grid { display: block !important; }
+  .flow.is-open .flow__media { display: none !important; }
+  .flow__inner { position: static !important; max-height: none !important; overflow: visible !important; padding: 0 !important; border: 0 !important; }
+
+  /* cards keep their lines, never split across pages */
+  :is(.plan, .sheet, .qa__i, .story, .quote, .person, .deploy__c, .tool, .node, .point, .control, .info__c, .seo__item, .doc__card) {
+    break-inside: avoid; border-color: #ccc !important;
+  }
+  .plan--featured { border: 1.5px solid #111 !important; }
+  /* the table's marks are drawn backgrounds on screen; on paper they are characters */
+  .ctable td.yes::before { content: "\2713"; width: auto; height: auto; border-radius: 0; }
+  .ctable td.no::before { content: "\2013"; width: auto; height: auto; margin: 0; }
+  .plan__cta { display: none !important; }
+  /* the diagram's wires are painted backgrounds on screen; on paper they are drawn lines,
+     solid inside the network, dashed out to the cloud model, as its caption says */
+  .map__row .node + .node::before { height: 0 !important; border-top: 1.5px solid #888; }
+  .node--opt::before { width: 0 !important; border-left: 1.5px dashed #888; }
+  .qa__b { height: auto !important; }
+  .route__h, .hero__h { font-size: 26pt !important; }
+  h2, h3 { break-after: avoid; }
+
+  /* a link on paper is only as good as its address */
+  :is(.sec, .flow) a[href^="http"]::after, :is(.sec, .flow) a[href^="mailto:"]::after {
+    content: " (" attr(href) ")"; font-size: .85em; word-break: break-all;
+  }
+}

@@ -1,0 +1,129 @@
+.nav {
+  position: fixed; inset: 0 0 auto 0; z-index: 40;
+  display: flex; align-items: center; gap: 24px;
+  padding: 22px var(--margin);
+}
+/* past the ring the nav takes a ground of its own, so the copy scrolling
+   under it never runs into its links; over the ring it is clear */
+.nav::before {
+  content: ""; position: absolute; inset: 0 0 -24px; z-index: -1; pointer-events: none;
+  background: linear-gradient(to bottom, rgb(var(--ground-rgb) / .96) 55%, rgb(var(--ground-rgb) / 0));
+  opacity: 0; transition: opacity var(--t-3) var(--e-out);
+}
+body.is-past-ring .nav::before, body.is-route-open .nav::before { opacity: 1; }
+
+.nav__logo { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; border-radius: 10px; }
+.nav__mark {
+  display: grid; place-items: center; width: 30px; height: 30px;
+  border: 1px solid var(--line-2); border-radius: 9px;
+  background: var(--glass); color: var(--ink);
+}
+.nav__mark svg { width: 16px; height: 16px; }
+.nav__name { font-weight: 500; font-size: 16.5px; letter-spacing: -.02em; }
+
+.nav__links { display: flex; align-items: center; gap: 2px; margin-left: 10px; }
+.nav__link {
+  position: relative; padding: 9px 14px; border-radius: var(--r-pill);
+  color: var(--ink-2); text-decoration: none; font-size: 14px;
+  transition: color var(--t-2) var(--e-out), background-color var(--t-2) var(--e-out);
+}
+.nav__link:hover { color: var(--ink); background: var(--wash-2); }
+/* the section being read */
+.nav__link[aria-current] { color: var(--ink); }
+.nav__link[aria-current]::after {
+  content: ""; position: absolute; left: 50%; bottom: 3px; width: 4px; height: 4px; margin-left: -2px;
+  border-radius: 50%; background: var(--cobalt-on);
+}
+
+/* the split-flap: each character is two stacked copies in a clipped box;
+   hover rolls one out and the other in, 40ms per character */
+.ch {
+  display: inline-block; position: relative;
+  height: 1.34em; line-height: 1.34em;
+  overflow: hidden; vertical-align: top;
+}
+.ch__top, .ch__bot { display: block; white-space: pre; transition: transform var(--t-2) var(--e-out); transition-delay: calc(var(--i) * 30ms); }
+.ch__bot { position: absolute; left: 0; top: 0; transform: translateY(100%); }
+.nav__link:hover .ch__top { transform: translateY(-100%); }
+.nav__link:hover .ch__bot { transform: translateY(0); }
+.ch__sp { width: .28em; }
+
+.nav__end { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+
+/* ------------------------------------------------------ the theme */
+/* the moon in the dark, the sun in the light: what the page is, said by the
+   switch that changes it; the two turn into each other */
+.theme {
+  display: grid; place-items: center; flex: none; width: 40px; height: 40px; padding: 0;
+  border: 1px solid var(--line-2); border-radius: var(--r-pill); background: var(--glass);
+  color: var(--ink); cursor: pointer;
+  transition: border-color var(--t-2) var(--e-out), background-color var(--t-2) var(--e-out), transform var(--t-1) var(--e-out);
+}
+.theme:hover { border-color: var(--line-3); }
+.theme:active { transform: scale(.94); }
+.theme__i { width: 19px; height: 19px; overflow: visible; }
+.theme__sun, .theme__rays, .theme__moon {
+  transform-box: view-box; transform-origin: 12px 12px;
+  transition: transform var(--t-3) var(--spring-soft), opacity var(--t-2) var(--e-out);
+}
+.theme__sun, .theme__rays { opacity: 0; transform: rotate(-90deg) scale(.4); }
+.theme__moon { opacity: 1; transform: none; }
+:root[data-theme="light"] .theme__sun, :root[data-theme="light"] .theme__rays { opacity: 1; transform: none; }
+:root[data-theme="light"] .theme__moon { opacity: 0; transform: rotate(90deg) scale(.4); }
+
+@media (max-width: 900px) {
+  .nav__links { display: none; }
+}
+@media (max-width: 640px) {
+  .nav { padding-top: 16px; padding-bottom: 16px; gap: 12px; }
+  .nav__end { gap: 8px; }
+  /* on a phone the bar holds the name, the theme and the menu; Book a demo
+     is the hero's first button and the menu's, and Log in is in the menu */
+  .nav__end .btn { display: none; }
+}
+
+/* --------------------------------------------------------- phone menu */
+.nav__menu {
+  display: none; align-items: center; gap: 10px; height: 40px; padding: 0 15px 0 13px;
+  border: 1px solid var(--line-2); border-radius: var(--r-pill); background: var(--glass);
+  color: var(--ink); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: border-color var(--t-2) var(--e-out);
+}
+.nav__menu:hover { border-color: var(--line-3); }
+.nav__menu-i { position: relative; width: 14px; height: 10px; }
+.nav__menu-i::before, .nav__menu-i::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 1.6px; border-radius: 1px; background: currentColor;
+  transition: transform var(--t-2) var(--e-out), top var(--t-2) var(--e-out);
+}
+.nav__menu-i::before { top: 1px; }
+.nav__menu-i::after { top: 7.4px; }
+.nav__menu[aria-expanded="true"] .nav__menu-i::before { top: 4.2px; transform: rotate(45deg); }
+.nav__menu[aria-expanded="true"] .nav__menu-i::after { top: 4.2px; transform: rotate(-45deg); }
+
+.menu {
+  position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column;
+  padding: 100px var(--margin) 28px; overflow-y: auto; overscroll-behavior: contain;
+  background: var(--ground);
+}
+.menu[hidden] { display: none; }
+/* the nav stays on top of its own menu: the button that opened it closes it */
+body.is-menu-open .nav { z-index: 71; background: none; }
+.menu__links { display: grid; }
+.menu__link {
+  display: flex; align-items: baseline; gap: 16px; padding: 14px 0;
+  border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none;
+  font-family: var(--serif); font-size: clamp(30px, 8vw, 44px); line-height: 1.1; letter-spacing: -.02em;
+}
+.menu__link[aria-current="page"] { color: var(--cobalt-on); }
+.menu__n { min-width: 2.2em; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--cobalt-on); }
+.menu__end { display: grid; gap: 10px; margin-top: 28px; }
+.menu__fine { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: auto 0 0; padding-top: 28px; font-size: 13px; }
+.menu__fine a { color: var(--ink-3); text-decoration: none; }
+
+@media (max-width: 900px) {
+  .nav__menu { display: inline-flex; }
+}
+@media (max-width: 420px) {
+  .nav__menu { padding: 0 13px; }
+  .nav__menu-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}

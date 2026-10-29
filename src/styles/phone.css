@@ -1,0 +1,383 @@
+/* ==========================================================================
+   The phone
+   --------------------------------------------------------------------------
+   Not the large page made smaller: the phone has its own way of being held.
+   What is used often sits where a thumb rests (the tour's arrows, the menu
+   as a sheet from the bottom edge); the ring fills
+   the screen and turns into the spiral by itself as the scroll goes; the
+   tour is swiped through like a deck and comes to rest on each workflow;
+   the plans are a row to swipe; headings sit left, where a reading eye
+   starts; and everything that can be pressed gives under the finger.
+   ========================================================================== */
+
+.tour__steer, .dots, .pick, .menu__handle { display: none; }
+
+@media (max-width: 767px) {
+  /* --------------------------------------------------------- the ring */
+  /* no switch and no bar: the ring changes shape by itself, and the pause is in the menu and the tour */
+  .switch, .foot { display: none; }
+  .hero { bottom: calc(40px + env(safe-area-inset-bottom)); }
+  .hero__h { font-size: clamp(35px, 10.6vw, 46px); line-height: .98; letter-spacing: -.028em; }
+  .hero__p { font-size: 15px; line-height: 1.55; margin-top: 14px; }
+  .hero__cta { margin-top: 20px; }
+  .hero__cta .btn { flex: 1 1 auto; }
+  .intro__say { bottom: calc(44px + env(safe-area-inset-bottom)); }
+  .intro__say-t { font-size: clamp(28px, 8.6vw, 36px); }
+
+  /* --------------------------------------------------------- the tour */
+  .tour__pin { padding: calc(74px + env(safe-area-inset-top)) var(--margin) calc(26px + env(safe-area-inset-bottom)); }
+  .tour__top { margin-bottom: 14px; }
+  .tour__count { display: none; }
+  .tour__kicker .tour__k { display: inline; }
+  .tour__kicker::before { display: block; }
+  .tour__index { display: none; }
+  .tour__slides { touch-action: pan-y; }
+  .tour__media { border-radius: 18px; box-shadow: 0 24px 50px -28px rgba(0,0,0,.8); }
+  .tour__h { font-size: clamp(28px, 8.4vw, 36px); line-height: 1.02; }
+  .tour__cat { margin-bottom: 10px; }
+  .tour__open { padding: 9px 16px 9px 13px; }
+  /* The frame takes what the words leave, the full width, from 16:9 at the
+     least to the upright cut's 4:5 at the most (the film covers it either
+     way), so there are no empty bands above or below. Behind it, the edges
+     of the next two cards, as a deck: there is more to swipe to. */
+  html.js .tour .tour__slide:is(.is-on, .is-leaving) { gap: 30px; justify-content: flex-start; }
+  .tour__media {
+    flex: 1 1 auto; aspect-ratio: auto;
+    min-height: calc((100vw - 2 * var(--margin)) * 9 / 16);
+    max-height: calc((100vw - 2 * var(--margin)) * 5 / 4);
+    box-shadow: 0 12px 0 -6px var(--surface-3), 0 12px 0 -5px var(--line-2), 0 23px 0 -12px var(--surface-2), 0 23px 0 -11px var(--line), 0 34px 50px -30px rgba(0,0,0,.8);
+  }
+  .tour__copy { flex: none; }
+
+  /* ------------------------------------------------------ the sections */
+  /* headings start on the left, where the eye does, and run large */
+  .sec__inner { padding-top: 92px; padding-bottom: 72px; }
+  .route__head { text-align: left; margin-bottom: 34px; }
+  .route__kicker { justify-content: flex-start; }
+  .route__kicker::after { display: none; }
+  .route__h { font-size: clamp(36px, 10.6vw, 46px); line-height: 1; letter-spacing: -.026em; }
+  .route__lede { margin: 0; font-size: 15.5px; }
+  .route__sub { font-size: clamp(26px, 7.4vw, 31px); margin-top: 60px; }
+  .route__cta { text-align: left; padding: 34px 22px; }
+  .route__cta-p { margin-left: 0; }
+  .route__btns { justify-content: flex-start; }
+  .route__fine { text-align: left; }
+  .billing { margin-top: 22px; }
+
+  /* Rows to swipe, one card at a time with the next showing at the edge:
+     the plans, where it can run, what it works with. Under each, the dots,
+     and a pill that glides from dot to dot with the swipe itself
+     (src/ui/sections.ts writes where the row is, --at). */
+  .swipe {
+    display: flex; gap: 12px;
+    margin: 0 calc(-1 * var(--margin)); padding: 6px var(--margin) 10px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--margin);
+    overscroll-behavior-x: contain; scrollbar-width: none;
+  }
+  .swipe::-webkit-scrollbar { display: none; }
+  /* a row with nothing else to focus is reached by itself; its ring drawn inside, since it runs to the screen's edges */
+  .swipe:focus-visible { outline-offset: -3px; border-radius: 12px; }
+  .swipe > * { flex: 0 0 84%; scroll-snap-align: start; }
+  .dots { position: relative; display: flex; justify-content: center; gap: 12px; margin-top: 14px; }
+  .dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line-3); }
+  .dots::after {
+    content: ""; position: absolute; top: 0; left: 50%; width: 20px; height: 6px; border-radius: 3px; background: var(--cobalt-on);
+    transform: translateX(calc(-50% + (var(--at, 0) - (var(--count, 4) - 1) / 2) * 18px));
+  }
+  /* what it works with: each tool a card of its own in the row, not one sheet split three ways */
+  .tools { border: 0; border-radius: 0; background: none; box-shadow: none; overflow-x: auto; }
+  .tool, .tool + .tool { border: 1px solid var(--line-2); border-radius: var(--r-card); background: var(--sheen), var(--surface); box-shadow: var(--edge); }
+
+  /* the security list: a grid of its titles, each opening where it is tapped, across the grid */
+  .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .control { padding: 0; border: 0; }
+  .control:has(.control__d[open]) { grid-column: 1 / -1; }
+  .control__d { height: 100%; border: 1px solid var(--line-2); border-radius: 16px; background: var(--sheen), var(--surface); box-shadow: var(--edge); }
+  .control__s { align-items: flex-start; gap: 10px; min-height: 64px; padding: 13px 12px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .control__t { margin: 1px 0 0; font-size: 14.5px; }
+  .control__d[open] .control__i { background: var(--cobalt); color: #fff; }
+  .control__d > .control__b { margin: 0 14px 0 48px; padding-bottom: 15px; animation: fade var(--t-2) var(--e-out); }
+
+  /* next to a cloud assistant: each question a row of its own, the two answers side by side under it */
+  .ctable--vs { min-width: 0; }
+  .ctable--vs thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .ctable--vs tbody { display: block; }
+  .ctable--vs tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 14px 6px 16px; }
+  .ctable--vs tr + tr { border-top: 1px solid var(--line); }
+  .ctable--vs th[scope="row"] {
+    grid-column: 1 / -1; position: static; padding: 0 4px; background: none; white-space: normal;
+    font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .ctable--vs td { padding: 10px 12px; border-radius: 12px; background: var(--wash); white-space: normal; font-size: 14px; line-height: 1.45; }
+  .ctable--vs td.ctable__us { background: rgba(24,80,224,.13); }
+  .ctable--vs td::before {
+    content: attr(data-who); display: block; margin-bottom: 4px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .ctable--vs td.ctable__us::before { color: var(--cobalt-on); }
+  .sheet:has(.ctable--vs) .sheet__scroll { mask-image: none; }
+
+  /* what each plan includes: one plan beside the capabilities, picked above the table */
+  .pick {
+    position: relative; display: flex; gap: 2px; margin: 0 0 14px; padding: 4px;
+    border: 1px solid var(--glass-b); border-radius: var(--r-pill); background: var(--surface);
+  }
+  .pick button {
+    position: relative; z-index: 1; flex: 1; min-height: 44px; padding: 0 6px; border: 0; border-radius: var(--r-pill);
+    background: none; font: inherit; font-size: 13.5px; font-weight: 500; color: var(--ink-2); cursor: pointer;
+    -webkit-tap-highlight-color: transparent; transition: color var(--t-2) var(--e-out);
+  }
+  .pick button[aria-pressed="true"] { color: var(--ink); }
+  .pick__pill { position: absolute; left: 0; top: 4px; bottom: 4px; width: 0; border-radius: var(--r-pill); background: var(--surface-3); box-shadow: var(--edge); }
+  .ctable--plans { min-width: 0; }
+  #planTable .sheet__scroll { mask-image: none; }
+  #planTable .ctable--plans :is(th, td):not(:first-child) { display: none; }
+  #planTable[data-col="2"] .ctable--plans :is(th, td):nth-child(2),
+  #planTable[data-col="3"] .ctable--plans :is(th, td):nth-child(3),
+  #planTable[data-col="4"] .ctable--plans :is(th, td):nth-child(4),
+  #planTable[data-col="5"] .ctable--plans :is(th, td):nth-child(5) { display: table-cell; }
+  .ctable--plans :is(td, thead th:not(:first-child)) { text-align: right; }
+
+  /* the map, on one screen: each place a row, its mark at the left, the
+     wires running down the line of the marks; outside the line, the two
+     side by side */
+  .map { --gap: 14px; --drop: 28px; --net-pad: 16px; }
+  .map__net { padding: 30px 14px var(--net-pad); border-radius: 24px; }
+  .map__row { gap: var(--gap); }
+  .map .node {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr); grid-template-areas: "i t" "i d";
+    justify-items: start; align-items: center; column-gap: 14px; row-gap: 1px; padding: 12px 14px; text-align: left;
+  }
+  .map .node__i { grid-area: i; width: 40px; height: 40px; margin: 0; border-radius: 12px; }
+  .map .node__i svg { width: 21px; height: 21px; }
+  .map .node__t { grid-area: t; font-size: 18px; }
+  .map .node__d { grid-area: d; max-width: none; font-size: 13px; }
+  .map__row .node + .node::before, .map__row .node + .node::after { left: 34px; }
+  .map__out { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding-top: var(--drop); }
+  .map__out .node { grid-template-columns: minmax(0, 1fr); grid-template-areas: "i" "t" "d"; row-gap: 4px; padding: 12px; }
+  .map__out .node__i { margin-bottom: 4px; }
+  .map__cap { margin-top: 18px; text-align: left; }
+
+  /* the footer band's links: a thumb's height each, the underline kept under the word */
+  .rfoot ul { gap: 0; }
+  .rfoot__col a { display: inline-flex; align-items: center; min-height: 44px; background-position: 100% calc(100% - 12px); }
+  .rfoot__col a:hover, .rfoot__col a:focus-visible { background-position: 0 calc(100% - 12px); }
+  .rfoot__pause { min-height: 44px; }
+
+  .rfoot__mark { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+}
+
+/* --------------------------------------------- a phone, either way up */
+@media (max-width: 767px), (orientation: landscape) and (max-height: 500px) and (hover: none) {
+  /* Over the ring the top of the screen fades to the ground, so the bar,
+     and the Start and End under it, never sit on a card: the cards pass
+     under the fade on their way round. */
+  .vig--top {
+    height: max(26vh, 150px);
+    background: linear-gradient(to bottom, var(--ground) 0%, rgb(var(--ground-rgb) / .94) 40%, rgb(var(--ground-rgb) / .55) 68%, rgb(var(--ground-rgb) / 0) 100%);
+  }
+  /* the start and the end, across the top under the bar, on that fade */
+  .rail {
+    top: calc(72px + env(safe-area-inset-top)); left: var(--margin); right: var(--margin); transform: none;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .rail__k { background: none; padding: 0; }
+  .rail__bar { flex: 1; width: auto; height: 2px; }
+  .rail__fill { transform-origin: 0 50%; transform: scaleX(0); }
+  /* Past the ring and the tour, where the page is read, the bar has a ground
+     of its own, and slides away while the page scrolls down (src/ui/nav.ts) */
+  .nav { transition: transform var(--t-3) var(--e-out); }
+  body.is-paged .nav::before { inset: 0; background: var(--ground); box-shadow: inset 0 -1px 0 var(--line); }
+  body.is-nav-away .nav:not(:focus-within) { transform: translateY(calc(-100% - 2px)); }
+
+  /* every control a thumb aims at is 44px at the least */
+  .theme { width: 44px; height: 44px; }
+  .nav__menu { height: 44px; min-width: 44px; justify-content: center; }
+  .nav__logo { padding: 7px 0; margin: -7px 0; }
+  .btn { height: 44px; }
+  .chip { min-height: 44px; }
+  .tour__pause { min-width: 44px; min-height: 44px; justify-content: center; }
+  .tour__skip { height: 44px; }
+  .doc__back { height: 44px; }
+  .doc__tab { display: inline-flex; align-items: center; min-height: 40px; }
+  /* where a control is drawn smaller, its reach is not: an invisible margin takes the tap */
+  :is(.billing button, .doc__tab, .rfoot__pause, .menu__pause) { position: relative; }
+  :is(.billing button, .doc__tab)::after { content: ""; position: absolute; inset: -6px 0; }
+  :is(.rfoot__pause, .menu__pause) { min-height: 44px; }
+  .menu__legal a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  /* the small capitals that label things: 12px at the least, so a phone can read them */
+  :is(.hero__kicker, .hero__proof-k, .route__kicker, .tour__kicker, .tour__cat, .tour__sn, .tour__time,
+      .point__n, .map__tag, .ctable__cap, .ctable thead th, .plan__badge, .info__k, .doc__updated, .doc__page-k,
+      .story__meta, .story__k, .facts dt, .person__r, .book__k, .flow__meta, .flow__n, .rail) { font-size: 12px; }
+  .tag { font-size: 12px; }
+}
+
+/* ------------------------------------------------ a phone on its side */
+@media (orientation: landscape) and (max-height: 500px) and (hover: none) {
+  /* the bar as upright: the name, the theme and the menu */
+  .nav { padding-top: 10px; padding-bottom: 10px; }
+  .nav__links, .nav__end .btn { display: none; }
+  .nav__menu { display: inline-flex; }
+  .switch, .foot, .intro__cue { display: none; }
+  .rail { top: calc(60px + env(safe-area-inset-top)); }
+  /* the headline low on the left, beside the ring rather than over it */
+  .hero { bottom: calc(16px + env(safe-area-inset-bottom)); width: min(470px, 58vw); }
+  .hero__kicker { margin-bottom: 10px; }
+  .hero__h { font-size: clamp(26px, 4.2vw, 34px); }
+  .hero__p { font-size: 13.5px; line-height: 1.5; margin-top: 10px; }
+  .hero__cta { margin-top: 14px; }
+  .intro__say { bottom: calc(22px + env(safe-area-inset-bottom)); width: min(470px, 58vw); }
+  .intro__say-t { font-size: clamp(22px, 3.6vw, 28px); }
+
+  /* the tour on one screen: the film on the left, the words beside it */
+  .tour__pin { padding: calc(60px + env(safe-area-inset-top)) var(--margin) calc(10px + env(safe-area-inset-bottom)); }
+  .tour__top { margin-bottom: 8px; }
+  .tour__count, .tour__index, .tour__lede { display: none; }
+  .tour__kicker .tour__k { display: inline; }
+  html.js .tour .tour__slide:is(.is-on, .is-leaving) {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "media copy";
+    align-items: center; gap: clamp(16px, 3vw, 28px);
+  }
+  .tour__slides { touch-action: pan-y; }
+  .tour__media { height: 100%; width: auto; max-width: 56vw; align-self: center; }
+  .tour__h { font-size: clamp(22px, 3.4vw, 28px); }
+  .tour__cat { margin-bottom: 8px; }
+  .tour__steps { margin-top: 12px; }
+  html.js .tour .tour__steps { padding-bottom: 58px; }
+  .tour__open { margin-top: 8px; }
+  .tour__steer { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+  .tour__arrow {
+    display: grid; place-items: center; flex: none; width: 44px; height: 44px; padding: 0;
+    border-radius: 50%; border: 1px solid var(--line-2); background: var(--wash); box-shadow: var(--edge);
+    color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .tour__arrow svg { width: 20px; height: 20px; }
+  .tour__where {
+    flex: 1; display: grid; align-content: center; gap: 7px; min-height: 44px; padding: 0 6px;
+    border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer;
+  }
+  .tour__where-n { justify-self: center; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .tour__where-n .tour__idx { color: var(--ink); }
+  .tour__where-bar { position: relative; height: 2px; border-radius: 2px; background: var(--line-2); overflow: hidden; }
+  .tour__where-bar i { position: absolute; inset: 0; background: var(--cobalt-on); transform-origin: 0 50%; transform: scaleX(0); }
+  .sec__inner { padding-top: 84px; }
+}
+
+@media (max-width: 767px) {
+  .tour__steer { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+  .tour__arrow {
+    display: grid; place-items: center; flex: none; width: 46px; height: 46px; padding: 0;
+    border-radius: 50%; border: 1px solid var(--line-2); background: var(--wash); box-shadow: var(--edge);
+    color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: transform var(--t-1) var(--e-out), background-color var(--t-2) var(--e-out);
+  }
+  .tour__arrow svg { width: 20px; height: 20px; }
+  .tour__arrow:active { transform: scale(.9); background: var(--wash-2); }
+  .tour__where {
+    flex: 1; display: grid; align-content: center; gap: 9px; min-height: 46px; padding: 0 6px;
+    border: 0; border-radius: 12px; background: none; color: inherit; font: inherit; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; transition: background-color var(--t-2) var(--e-out);
+  }
+  .tour__where:active { background: var(--wash-2); }
+  .tour__where-n { justify-self: center; font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .tour__where-n .tour__idx { color: var(--ink); }
+  .tour__where-bar { position: relative; height: 2px; border-radius: 2px; background: var(--line-2); overflow: hidden; }
+  .tour__where-bar i { position: absolute; inset: 0; background: var(--cobalt-on); transform-origin: 0 50%; transform: scaleX(0); }
+}
+
+/* All twelve, as a sheet from the bottom edge (src/ui/tour.ts): the count
+   between the tour's arrows opens it. The one showing is marked. */
+.tlist {
+  position: fixed; inset: auto 0 0 0; width: 100%; max-width: 640px; max-height: calc(100svh - 64px);
+  margin: 0 auto; padding: 10px var(--margin) calc(18px + env(safe-area-inset-bottom));
+  border: 0; border-top: 1px solid var(--line-2); border-radius: 28px 28px 0 0;
+  background: var(--sheen), var(--surface); color: var(--ink);
+  box-shadow: var(--edge), 0 -30px 80px -30px rgba(0,0,0,.7);
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.tlist::backdrop { background: rgba(3,4,8,.55); animation: fade var(--t-2) var(--e-out); }
+.tlist.is-closing::backdrop { opacity: 0; transition: opacity var(--t-2) var(--e-in); }
+.tlist__handle { display: block; width: 42px; height: 5px; margin: 0 auto 10px; border-radius: 3px; background: var(--line-3); }
+.tlist__h { margin: 0 0 6px; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--cobalt-on); }
+.tlist__items { list-style: none; margin: 0; padding: 0; }
+.tlist__a {
+  display: grid; grid-template-columns: 2.4em minmax(0, 1fr) auto; align-items: baseline; gap: 4px 10px;
+  min-height: 48px; padding: 11px 0; border-bottom: 1px solid var(--line);
+  color: var(--ink); text-decoration: none; -webkit-tap-highlight-color: transparent;
+  transition: color var(--t-2) var(--e-out), transform var(--t-2) var(--e-out);
+}
+.tlist__a:active { transform: translateX(4px); color: var(--cobalt-on); }
+.tlist__n { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.tlist__t { font-family: var(--serif); font-size: 21px; line-height: 1.2; letter-spacing: -.01em; }
+.tlist__c { font-family: var(--mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.tlist__a[aria-current] .tlist__t, .tlist__a[aria-current] .tlist__n { color: var(--cobalt-on); }
+
+/* the tour comes to rest on a workflow when a finger's scroll ends near one */
+.tour__snap { position: absolute; left: 0; top: calc((var(--i) + .06) * 75vh); width: 1px; height: 1px; visibility: hidden; pointer-events: none; }
+@media (pointer: coarse) and (max-width: 1024px) {
+  html { scroll-snap-type: y proximity; }
+  .tour__snap { scroll-snap-align: start; }
+}
+
+/* ------------------------------------------------- the menu, as a sheet */
+@media (max-width: 900px), (orientation: landscape) and (max-height: 500px) and (hover: none) {
+  .menu-scrim { position: fixed; inset: 0; z-index: 69; background: rgba(3,4,8,.55); -webkit-tap-highlight-color: transparent; }
+  .menu-scrim[hidden] { display: none; }
+  .menu {
+    inset: auto 0 0 0; max-height: calc(100svh - 64px);
+    padding: 10px var(--margin) calc(22px + env(safe-area-inset-bottom));
+    border-radius: 28px 28px 0 0; border-top: 1px solid var(--line-2);
+    background: var(--sheen), var(--surface);
+    box-shadow: var(--edge), 0 -30px 80px -30px rgba(0,0,0,.7);
+  }
+  .menu__handle { display: block; flex: none; width: 42px; height: 5px; margin: 0 auto 8px; border-radius: 3px; background: var(--line-3); }
+  .menu__link {
+    padding: 13px 0; font-size: clamp(28px, 7.8vw, 36px); -webkit-tap-highlight-color: transparent;
+    transition: color var(--t-2) var(--e-out), transform var(--t-2) var(--e-out);
+  }
+  .menu__link:active { color: var(--cobalt-on); transform: translateX(6px); }
+  .menu__end { grid-template-columns: 1fr 1fr; margin-top: 22px; }
+  .menu__fine { display: grid; gap: 6px; margin: 14px 0 0; padding-top: 0; }
+  .menu__pause { justify-self: start; font-size: 13.5px; }
+  .menu__legal { display: flex; flex-wrap: wrap; gap: 0 18px; margin: 0; font-size: 13px; }
+  .menu__legal a { color: var(--ink-3); text-decoration: none; }
+  /* the nav (and its button) stays over the dimmed page, above the sheet's scrim */
+  body.is-menu-open .nav { z-index: 71; }
+}
+
+/* -------------------------------------------- Legal, as a sheet */
+/* On a phone Legal rises from the bottom edge over the dimmed page and goes
+   back down the same way (or a finger pulls it down, src/ui/router.ts); an
+   address of its own, landed on, shows it in place from the first paint. */
+@media (max-width: 767px) {
+  .doc {
+    top: calc(8px + env(safe-area-inset-top)); border-radius: 22px 22px 0 0;
+    box-shadow: 0 -24px 60px -24px rgba(0,0,0,.6);
+    opacity: 1; transform: translateY(105%);
+    transition: transform var(--t-3) var(--e-in), visibility 0s var(--t-3);
+  }
+  @supports (transition-behavior: allow-discrete) {
+    .doc { transition: transform var(--t-3) var(--e-in), visibility 0s var(--t-3), content-visibility var(--t-3) allow-discrete; }
+  }
+  .doc.is-open { transform: none; transition: transform var(--t-4) var(--spring), visibility 0s; }
+  /* landed on, it is the page, not a sheet over one: full height from the first paint, and kept so once the scripts take over */
+  :is(html[data-route="legal"] .doc, .doc.is-landed) { top: 0; border-radius: 0; box-shadow: none; }
+  html[data-route="legal"] .doc { transform: none; transition: none; }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 59; pointer-events: none;
+    background: rgba(3,4,8,.6); opacity: 0; visibility: hidden;
+    transition: opacity var(--t-3) var(--e-out), visibility 0s var(--t-3);
+  }
+  body.is-doc-open::after { opacity: 1; visibility: visible; transition: opacity var(--t-3) var(--e-out), visibility 0s; }
+  html[data-route="legal"] body::after { display: none; }
+}
+
+/* ----------------------------------------- what gives under a finger */
+@media (hover: none) {
+  a, button, summary { -webkit-tap-highlight-color: transparent; }
+  :is(.btn, .chip, .tool, .deploy__c, .info__c, .doc__card, .doc__page, .doc__tab, .nav__menu, .theme, .switch__btn, .tour__tick):active {
+    transform: scale(.965); transition-duration: var(--t-1);
+  }
+  .qa__q:active { opacity: .75; }
+}

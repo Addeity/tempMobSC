@@ -1,0 +1,208 @@
+import type { Workflow } from './types.ts';
+
+/*
+ * The twelve workflows, one per clip of the recording.
+ *
+ * Order matters: it is the order of the cells in the card atlas and of the
+ * cards' numbering. Copy is written from what is on screen in each clip, in
+ * the product's own words where it has them. Step times are seconds of the
+ * finished film; `focus` is where the camera settles for that step.
+ */
+export const WORKFLOWS = [
+  {
+    key: 'dashboard',
+    title: 'Your day on one page',
+    category: 'Today',
+    lede: 'Open the workroom and the day is already laid out: what you are carrying, the timer, your week in hours, the projects in progress and what the company has posted.',
+    note: 'Read from your own tickets, timesheet and notices. Nothing on it is typed in twice.',
+    source: { start: 0.5, end: 16.0, cuts: [[1.367, 1.767], [4.433, 4.8], [5.867, 6.267]] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'Greeting', body: 'Your open and overdue work, counted and named.', focus: [0.13, 0.03, 0.62, 0.42] },
+      { t: 2.1, title: 'What you are carrying', body: 'Tickets with their state and due date, beside the timer.', focus: [0.16, 0.27, 0.58, 0.33] },
+      { t: 6.3, title: 'Your week', body: 'Hours logged per day, read from the timesheet.', focus: [0.16, 0.3, 0.44, 0.32] },
+      { t: 8.3, title: 'Projects and notices', body: 'Progress per project, then what the company has announced.', focus: [0.16, 0.14, 0.6, 0.46] },
+      { t: 12.3, title: 'Outside', body: 'The weather and the news for the office’s city.', focus: [0.52, 0.24, 0.4, 0.52] },
+    ],
+  },
+  {
+    key: 'assistant',
+    title: 'Ask your own documents',
+    category: 'Assistant',
+    lede: 'A question box over the company’s documents. Beside it, each answer shows the passages it came from, any memory it applied and what the turn cost.',
+    note: 'The model server is offline in this recording, so the workroom says so instead of guessing. Documents, search and past work still answer.',
+    source: { start: 20.0, end: 27.5, cuts: [[4.567, 4.733], [6.567, 6.8]] },
+    speed: 1,
+    // the product's old name in the sidebar header, while the chat page shows it
+    masks: [{ kind: 'cover', rect: [0.034, 0.022, 0.037, 0.024], color: '#ffffff', during: [[0, 4.6], [6.45, 7.3]] }],
+    steps: [
+      { t: 0, title: 'A private room', body: 'Everything here stays inside this network.', focus: [0.08, 0.03, 0.58, 0.32] },
+      { t: 1, title: 'What it knows', body: 'Documents, passages indexed and remembered facts, counted where you ask.', focus: [0.1, 0.29, 0.5, 0.2] },
+      { t: 2.5, title: 'More', body: 'Skills, live activity and customisation, one click from the question.', focus: [0, 0.02, 0.34, 0.36] },
+      { t: 4.5, title: 'Skills', body: 'Instructions for one kind of work, loaded only when that work comes up.', focus: [0.3, 0.02, 0.46, 0.46] },
+      { t: 5.8, title: 'Back to the question', body: 'Answers cite their sources. Check them before acting on anything that matters.', focus: [0.08, 0.64, 0.6, 0.35] },
+    ],
+  },
+  {
+    key: 'newproject',
+    title: 'Start a project the way it will run',
+    category: 'Projects',
+    lede: 'Name it, give it a key and a lead, then choose how it will be run. The method sets the stages, the meetings and who answers for each.',
+    note: 'Each question says what its answer changes. Leave one empty and nothing is assumed for you.',
+    source: { start: 217.0, end: 255.0, cuts: [[36.267, 37.867]] },
+    speed: 1.6545,
+    steps: [
+      { t: 0.6, title: 'Name and key', body: 'The key becomes the ticket prefix and cannot be changed later.', focus: [0.31, 0.03, 0.38, 0.5] },
+      { t: 2.4, title: 'Lead and team', body: 'Who runs it and ticks its stages off, and who can see it.', focus: [0.31, 0.34, 0.38, 0.52] },
+      { t: 7.8, title: 'How it will be run', body: 'Scrum, Kanban, Waterfall and other methods, each with its own stages.', focus: [0.17, 0.04, 0.66, 0.62] },
+      { t: 17.5, title: 'Set up the method', body: 'Lean asks for a work-in-progress limit and a lead time you would accept.', focus: [0.17, 0.19, 0.66, 0.64] },
+      { t: 21.2, title: 'Create', body: 'The project opens with its stages already laid out.', focus: [0.48, 0.52, 0.4, 0.38] },
+    ],
+  },
+  {
+    key: 'stages',
+    title: 'Tick off the stages',
+    category: 'Projects',
+    lede: 'A project carries its method’s meetings, stages and roles. Tick a stage when it is done and the next one starts.',
+    note: 'Roles nobody holds are shown as empty, not filled in for you.',
+    source: { start: 54.0, end: 69.0, cuts: [] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'Meetings', body: 'Daily scrum, planning, refinement, review and retrospective, each with a length and an owner.', focus: [0.11, 0.4, 0.38, 0.52] },
+      { t: 2.5, title: 'Stages', body: 'Five stages, each done when its own condition is met.', focus: [0.28, 0.26, 0.46, 0.52] },
+      { t: 6, title: 'Tick one off', body: 'The sprint closes and the review starts on its own.', focus: [0.28, 0.22, 0.44, 0.46] },
+      { t: 9, title: 'How this team runs it', body: 'Sprint length and count, used to measure what really happened.', focus: [0.26, 0.44, 0.42, 0.48] },
+      { t: 12, title: 'Link the code', body: 'A repository and a branch to watch; a merged pull request can close a ticket.', focus: [0.64, 0.06, 0.36, 0.44] },
+    ],
+  },
+  {
+    key: 'design',
+    title: 'Review the design in place',
+    category: 'Projects',
+    lede: 'A Figma file linked to the project opens inside it, full screen if you like, so the review sits next to the tickets it belongs to.',
+    note: 'The prototype in this recording is hidden for privacy. In your workroom, the real file plays in that frame.',
+    source: { start: 46.0, end: 52.9, cuts: [] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'Design', body: 'The linked Figma file, listed under the project it belongs to.', focus: [0.07, 0.03, 0.7, 0.62] },
+      { t: 1.2, title: 'Opens in place', body: 'The file loads inside the project, with its own full-screen control.', focus: [0.16, 0.16, 0.6, 0.84] },
+      { t: 3.6, title: 'The live prototype', body: 'Every screen and interaction from the file, clickable without leaving the page.', focus: [0.22, 0.3, 0.46, 0.56] },
+    ],
+    masks: [{ kind: 'figma-prototype', rect: [0.194, 0.257, 0.517, 0.733] }],
+  },
+  {
+    key: 'views',
+    title: 'Every view of the same tickets',
+    category: 'Projects',
+    lede: 'List, calendar, timeline, mind map, sprints, team, workload, throughput and activity are all worked out from the project’s tickets. Change a ticket and every view follows.',
+    note: 'There is nothing to keep in sync by hand, because there is only one record.',
+    source: {
+      start: 82.0, end: 101.0,
+      cuts: [[1.4, 1.533], [5.0, 5.4], [6.533, 6.933], [8.167, 8.533], [9.9, 10.233], [11.833, 12.2], [13.533, 13.9], [15.767, 16.133]],
+    },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'List and calendar', body: 'Tickets with their owner and dates, then laid out by due date.', focus: [0.16, 0.06, 0.82, 0.86] },
+      { t: 2.8, title: 'Timeline', body: 'Bars across the weeks, with overdue work marked.', focus: [0.19, 0.1, 0.58, 0.42] },
+      { t: 4.8, title: 'Mind map and sprints', body: 'The tickets as a map of boxes, then sprint by sprint.', focus: [0.17, 0.06, 0.6, 0.52] },
+      { t: 6.8, title: 'Team', body: 'Who is on the project and what each person has open.', focus: [0.19, 0.22, 0.46, 0.62] },
+      { t: 8.8, title: 'Workload', body: 'Each person’s tickets against the time they have.', focus: [0.19, 0.22, 0.6, 0.42] },
+      { t: 9.9, title: 'How fast work moves', body: 'Tickets finished week by week, where the time goes, and the few tickets that took most of it.', focus: [0.19, 0.16, 0.6, 0.48] },
+      { t: 12.8, title: 'Activity', body: 'Every change in order, with who made it.', focus: [0.19, 0.2, 0.44, 0.52] },
+    ],
+  },
+  {
+    key: 'report',
+    title: 'A client report from the record',
+    category: 'Projects',
+    lede: 'The report for the client is assembled from the project’s own record. Read it, then save it into the project’s documents to edit and send.',
+    note: 'Every figure is counted from the rows behind it, and the row count sits beside each section so it can be checked.',
+    source: { start: 122.5, end: 133.0, cuts: [[1.2, 1.567]] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'Discussion', body: 'The project’s own thread, where decisions are written down.', focus: [0.28, 0.12, 0.52, 0.54] },
+      { t: 1.2, title: 'Report for the client', body: 'Assembled from tickets, recorded changes, iterations and documents.', focus: [0.28, 0.11, 0.5, 0.27] },
+      { t: 3.6, title: 'What is left out', body: 'What people wrote to each other, what the work cost, anything measuring a colleague.', focus: [0.28, 0.04, 0.52, 0.52] },
+      { t: 6.1, title: 'The document', body: 'Exactly what is saved: plain text you can read and edit.', focus: [0.28, 0.24, 0.52, 0.44] },
+      { t: 8.6, title: 'Save or copy', body: 'Into the project’s documents, or out as markdown.', focus: [0.28, 0.1, 0.5, 0.32] },
+    ],
+  },
+  {
+    key: 'time',
+    title: 'Time, leave and clients',
+    category: 'Back office',
+    lede: 'Your hours from the running timer, the team’s by project and by day, leave booked against each person’s year, and clients with their invoices and expenses, in the same room as the work.',
+    note: 'Days that have not happened yet are hatched, not drawn as nought. Empty means no allowance is set; zero is a different answer.',
+    source: { start: 150.0, end: 173.0, cuts: [[19.333, 19.533]] },
+    speed: 1.0364,
+    steps: [
+      { t: 0, title: 'Your hours', body: 'Today, this week and this month, from the running timer.', focus: [0.18, 0.08, 0.54, 0.44] },
+      { t: 1.9, title: 'Log against a ticket', body: 'Pick the ticket an hour belongs to as the timer starts.', focus: [0.58, 0.03, 0.42, 0.5] },
+      { t: 7.7, title: 'Your entries', body: 'Each timed entry against its ticket, editable where it stands.', focus: [0.18, 0.46, 0.62, 0.4] },
+      { t: 11.6, title: 'Where it went', body: 'The team’s hours by project and by day.', focus: [0.16, 0.28, 0.66, 0.68] },
+      { t: 13.5, title: 'Book leave', body: 'Time off requested against the year. Weekends are not counted.', focus: [0.19, 0.12, 0.64, 0.64] },
+      { t: 18.3, title: 'Clients', body: 'Billable hours, invoices, expenses and profit for each client.', focus: [0.19, 0.06, 0.62, 0.6] },
+    ],
+  },
+  {
+    key: 'floor',
+    title: 'The floor, live',
+    category: 'Live',
+    lede: 'An isometric workroom of the company. Below it: who is carrying what, what the assistant is doing, and the jobs the machine room ran today.',
+    note: 'Working means a timer is running. Nobody is marked present or absent; the floor knows what was started, not who is at a desk.',
+    source: { start: 174.1, end: 179.5, cuts: [] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'The workroom', body: 'Desks and the people at them, drawn from running timers.', focus: [0.12, 0.09, 0.86, 0.88] },
+      { t: 3.2, title: 'The team', body: 'Each person with what they carry and when it last moved.', focus: [0.16, 0.3, 0.8, 0.66] },
+      { t: 4.3, title: 'The machine room', body: 'Background jobs, their result and how long each took.', focus: [0.16, 0.3, 0.8, 0.66] },
+    ],
+  },
+  {
+    key: 'people',
+    title: 'Who can see what',
+    category: 'Company',
+    lede: 'People, roles and subscriptions in one place. A grid shows what each role may open, and every change lands in the security log.',
+    note: 'Only the last four digits of a card are kept. A full card number is refused.',
+    source: { start: 181.0, end: 203.0, cuts: [[1.7, 1.967], [3.033, 3.3], [7.167, 7.5], [19.633, 19.833]] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'Company', body: 'Notices and subscriptions for the whole company.', focus: [0.17, 0.12, 0.64, 0.52] },
+      { t: 2.7, title: 'Add a subscription', body: 'What it costs, who manages it and which project it serves.', focus: [0.3, 0.14, 0.4, 0.72] },
+      { t: 6.5, title: 'People and access', body: 'Everyone in the company, with their role.', focus: [0.3, 0.1, 0.56, 0.58] },
+      { t: 10.1, title: 'What each role may open', body: 'Click a cell to change it. Every change is in the security log.', focus: [0.3, 0.02, 0.56, 0.62] },
+      { t: 18.1, title: 'Agent roster', body: 'The assistant’s agents and what each one is for.', focus: [0.12, 0.06, 0.52, 0.4] },
+    ],
+  },
+  {
+    key: 'analytics',
+    title: 'Measured against thresholds',
+    category: 'Insight',
+    lede: 'Use across the instance: answers, tokens, response time and budget stops, each measured against the threshold a build has to meet.',
+    note: 'Counts, never conversations.',
+    source: { start: 338.1, end: 347.0, cuts: [] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'Last 30 days', body: 'Answers, tokens, mean response and answers stopped on a budget.', focus: [0.33, 0.06, 0.62, 0.32] },
+      { t: 1.6, title: 'Either theme', body: 'The same page in dark, switched from the sidebar. The numbers stay put.', focus: [0.3, 0.05, 0.66, 0.6] },
+      { t: 4, title: 'Against the thresholds', body: 'Latency and tool calls per answer, the target and the limit marked on each bar.', focus: [0.33, 0.35, 0.62, 0.32] },
+      { t: 6.5, title: 'Which tools get used', body: 'Whether each retrieval mode is picked, and whether it returns anything.', focus: [0.33, 0.62, 0.62, 0.36] },
+    ],
+  },
+  {
+    key: 'progress',
+    title: 'Progress, measured on purpose',
+    category: 'People',
+    lede: 'Your own work over 90 days: tickets finished and filed, hours logged, billable share and who you worked alongside, against the window before and the team median.',
+    note: 'Some things are not measured, on purpose, and the page says which.',
+    source: { start: 351.9, end: 357.5, cuts: [] },
+    speed: 1,
+    steps: [
+      { t: 0, title: 'The shape of your work', body: 'Ten measures on one chart, against the last window and the team median.', focus: [0.14, 0.16, 0.48, 0.78] },
+      { t: 1.2, title: 'Working with others', body: 'Who you worked alongside, the recent rate, and what is worth asking about.', focus: [0.18, 0.04, 0.64, 0.62] },
+      { t: 3, title: 'Reviews and colleagues', body: 'Reviews, what is deliberately not measured, and the people you can look at.', focus: [0.19, 0.04, 0.62, 0.62] },
+    ],
+  },
+] as const satisfies readonly Workflow[];
+
+export type WorkflowKey = (typeof WORKFLOWS)[number]['key'];
